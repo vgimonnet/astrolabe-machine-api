@@ -58,6 +58,31 @@ class ApiFenetreController extends AbstractController
      */
     public function postFenetre(Request $request){
         //Ajout d'une nouvelle fenêtre
+        $em = $this->getDoctrine()->getManager();
+
+        $fenetreValide = true;
+
+        if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posx') != null && $request->get('posy') != null )
+        {
+            $fenetre = new Fenetre();
+            $fenetre->setUrl($request->get('url'));
+            $fenetre->setWidth($request->get('width'));
+            $fenetre->setHeight($request->get('height'));
+            $fenetre->setPosx($request->get('posx'));
+            $fenetre->setPosy($request->get('posy'));
+
+            $em->persist($fenetre);
+            $em->flush();
+        } else {
+            $fenetreValide = false;
+        }
+
+        if($fenetreValide){
+            return $this->json(['reponse' => 'Fenêtre enregistrée avec succès']);
+        } else {
+            return $this->json(['reponse' => 'Erreur lors de l\'enregistrement de la fenêtre']);
+        }
+
     }
 
     /**
