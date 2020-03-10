@@ -113,5 +113,21 @@ class ApiFenetreController extends AbstractController
      */
     public function deleteFenetre(Request $request){
         //Suppression d'une fenêtre
+        $em = $this->getDoctrine()->getManager();
+
+        if( $request->get('id') )
+        {
+            $fenetre = $em->getRepository(Fenetre::class)->find($request->get('id'));
+            if($fenetre != null){
+                $em->remove($fenetre);
+                $em->flush();
+            } else {
+                return $this->json(['reponse' => 'Aucune fenêtre existante pour cet Id']);        
+            }
+        } else {
+            return $this->json(['reponse' => 'Erreur lors de la suppression de la fenêtre']);
+        }
+
+        return $this->json(['reponse' => 'Fenêtre supprimée avec succès']);
     }
 }
