@@ -37,6 +37,7 @@ class ApiFenetreController extends AbstractController
         $fenetres = $em->getRepository(Fenetre::class)->findAll();
         foreach ($fenetres as $fenetre) {
             array_push($data, [
+                "id" => $fenetre->getId(),
                 "url" => $fenetre->getUrl(),
                 "widht" => $fenetre->getWidth(),
                 "height" => $fenetre->getHeight(),
@@ -50,5 +51,26 @@ class ApiFenetreController extends AbstractController
         $reponse->headers->set("Content-Type", "application/json");
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
         return $reponse;
+    }
+
+    /**
+     * @Route("/post", name="post_fenetre", methods={"POST"})
+     */
+    public function postFenetre(Request $request){
+        //Ajout d'une nouvelle fenêtre
+    }
+
+    /**
+     * @Route("/put", name="put_fenetre", methods={"PUT"})
+     */
+    public function putFenetre(Request $request){
+        //Mise à jour d'une fenêtre
+    }
+
+     /**
+     * @Route("/delete", name="delete_fenetre", methods={"DELETE"})
+     */
+    public function deleteFenetre(Request $request){
+        //Suppression d'une fenêtre
     }
 }
