@@ -31,6 +31,11 @@ class User
      */
     private $is_admin;
 
+    /**
+     * @ORM\OneToOne(targetEntity="App\Entity\Authentification", mappedBy="user", cascade={"persist", "remove"})
+     */
+    private $authentification;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -68,6 +73,23 @@ class User
     public function setIsAdmin(bool $is_admin): self
     {
         $this->is_admin = $is_admin;
+
+        return $this;
+    }
+
+    public function getAuthentification(): ?Authentification
+    {
+        return $this->authentification;
+    }
+
+    public function setAuthentification(Authentification $authentification): self
+    {
+        $this->authentification = $authentification;
+
+        // set the owning side of the relation if necessary
+        if ($authentification->getUser() !== $this) {
+            $authentification->setUser($this);
+        }
 
         return $this;
     }
