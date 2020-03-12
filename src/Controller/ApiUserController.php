@@ -6,6 +6,7 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
 
@@ -16,41 +17,34 @@ use Symfony\Component\Routing\Annotation\Route;
 class ApiUserController extends AbstractController
 {
     /**
-     * @Route("/", name="api_user_index")
-     */
-    public function index()
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/ApiUserController.php',
-        ]);
-    }
-
-    /**
      * @Route("/login", name="user_login", methods={"POST"})
      */
     public function loginAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
+        $data = [];
 
         if($request->get('username') != null && $request->get('password') != null) {
-            $user = $em->getRepository(User::class)->findOneBy(array('username' => $request->get('username'), 'password' => $request->get('password')));
+            $user = $em->getRepository(User::class)->findOneBy(array('username' => $request->get('username')));
             if($user != null) {
                 $plainPassword = $request->get('password');
-                $options = [
-                    'cost' => 12,
-                ];
-                if(password_verify($plainPassword, password_hash($plainPassword, PASSWORD_BCRYPT, $options))) {
-                    return $this->json(['message' => 'Connexion accepté']);    
+                if(password_verify($plainPassword, $user->getPassword())) {
+                    $data = ['message' => 'Connexion accepté'];    
                 } else {
-                    return $this->json(['error' => 'Mot de passe ou identifiant invalide 3']);    
+                    $data = ['error' => 'Mot de passe invalide'];    
                 }
             } else {
-                return $this->json(['error' => 'Mot de passe ou identifiant invalide 2']);    
+                $data = ['error' => 'Identifiant invalide'];    
             }                    
         } else {
-            return $this->json(['error' => 'Mot de passe ou identifiant invalide 1']);
+            $data = ['error' => 'Mot de passe ou identifiant invalide'];
         }
+
+        $reponse = new Response();
+        $reponse->setContent(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse;
     }
 
     /**
@@ -59,6 +53,7 @@ class ApiUserController extends AbstractController
     public function createAction(Request $request)
     {
         $em = $this->getDoctrine()->getManager();
+        $data = [];
 
         if($request->get('username') != null && $request->get('password') != null) {
             $user_exist = $em->getRepository(User::class)->findOneBy(array('username' => $request->get('username')));
@@ -74,27 +69,16 @@ class ApiUserController extends AbstractController
                 $user->setIsAdmin(0);
                 $em->persist($user);
                 $em->flush();
-                return $this->json(['reponse' => "user créé"]);
+                $data = ['reponse' => "user créé"];
             }
-            return $this->json(['reponse' => "user existe deja "]);    
-
+            $data = ['reponse' => "user existe deja "];    
         }
-        
+        $data = ['reponse' => 'Mot de passe ou identifiant invalide'];
 
-            
-
-        return $this->json(['reponse' => 'Mot de passe ou identifiant invalide']);
-
-            // dump($user_exist);
-            // die;
-
-            // $encoded = 
-            // $user = $em->getRepository(UserRepository::class)->findByUsernameAndPassword($request->get('username'), $password);
-        // } else {
-            
-        // }
+        $reponse = new Response();
+        $reponse->setContent(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse;         
     }
-
-    
-
 }

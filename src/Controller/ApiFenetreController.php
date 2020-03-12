@@ -16,17 +16,6 @@ use Symfony\Component\Routing\Annotation\Route;
 class ApiFenetreController extends AbstractController
 {
     /**
-     * @Route("/", name="api_fenetre_accueil")
-     */
-    public function index()
-    {
-        return $this->json([
-            'message' => 'Welcome to your new controller!',
-            'path' => 'src/Controller/ApiFenetreController.php',
-        ]);
-    }
-
-    /**
      * @Route("/get", name="get_fenetre", methods={"GET"})
      */
     public function getFenetre(Request $request){
@@ -57,8 +46,8 @@ class ApiFenetreController extends AbstractController
      * @Route("/post", name="post_fenetre", methods={"POST"})
      */
     public function postFenetre(Request $request){
-        //Ajout d'une nouvelle fenêtre
         $em = $this->getDoctrine()->getManager();
+        $data = [];
 
         if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null )
         {
@@ -72,18 +61,24 @@ class ApiFenetreController extends AbstractController
             $em->persist($fenetre);
             $em->flush();
         } else {
-            return $this->json(['reponse' => 'Erreur lors de l\'enregistrement de la fenêtre']);
+           $data = ['reponse' => 'Erreur lors de l\'enregistrement de la fenêtre'];
         }
         
-        return $this->json(['reponse' => 'Fenêtre enregistrée avec succès']);        
+        $data = ['reponse' => 'Fenêtre enregistrée avec succès'];
+        
+        $reponse = new Response();
+        $reponse->setContent(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse;
     }
 
     /**
      * @Route("/put", name="put_fenetre", methods={"PUT"})
      */
     public function putFenetre(Request $request){
-        //Mise à jour d'une fenêtre
         $em = $this->getDoctrine()->getManager();
+        $data = [];
 
         if( $request->get('id') != null && $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null )
         {
@@ -97,15 +92,18 @@ class ApiFenetreController extends AbstractController
 
                 $em->flush();
             } else {
-                return $this->json(['reponse' => 'Aucune fenêtre existante pour cet Id']);        
+                $data = ['reponse' => 'Aucune fenêtre existante pour cet Id'];        
             }
-
         } else {
-            return $this->json(['reponse' => 'Erreur lors de la modification de la fenêtre']);
+            $data = ['reponse' => 'Erreur lors de la modification de la fenêtre'];
         }
+        $data = ['reponse' => 'Fenêtre modifiée avec succès'];
 
-        return $this->json(['reponse' => 'Fenêtre modifiée avec succès']);
-
+        $reponse = new Response();
+        $reponse->setContent(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse;
     }
 
      /**
@@ -114,6 +112,7 @@ class ApiFenetreController extends AbstractController
     public function deleteFenetre(Request $request){
         //Suppression d'une fenêtre
         $em = $this->getDoctrine()->getManager();
+        $data = [];
 
         if( $request->get('id') )
         {
@@ -122,12 +121,17 @@ class ApiFenetreController extends AbstractController
                 $em->remove($fenetre);
                 $em->flush();
             } else {
-                return $this->json(['reponse' => 'Aucune fenêtre existante pour cet Id']);        
+                $data = ['reponse' => 'Aucune fenêtre existante pour cet Id'];        
             }
         } else {
-            return $this->json(['reponse' => 'Erreur lors de la suppression de la fenêtre']);
+            $data = ['reponse' => 'Erreur lors de la suppression de la fenêtre'];
         }
+        $data = ['reponse' => 'Fenêtre supprimée avec succès'];
 
-        return $this->json(['reponse' => 'Fenêtre supprimée avec succès']);
+        $reponse = new Response();
+        $reponse->setContent(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse;
     }
 }
