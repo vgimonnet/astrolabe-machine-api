@@ -27,16 +27,6 @@ class User
     private $password;
 
     /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $token;
-
-    /**
-     * @ORM\Column(type="string", length=255)
-     */
-    private $refresh_token;
-
-    /**
      * @ORM\Column(type="boolean")
      */
     private $is_admin;
@@ -66,30 +56,6 @@ class User
     public function setPassword(string $password): self
     {
         $this->password = $password;
-
-        return $this;
-    }
-
-    public function getToken(): ?string
-    {
-        return $this->token;
-    }
-
-    public function setToken(string $token): self
-    {
-        $this->token = $token;
-
-        return $this;
-    }
-
-    public function getRefreshToken(): ?string
-    {
-        return $this->refresh_token;
-    }
-
-    public function setRefreshToken(string $refresh_token): self
-    {
-        $this->refresh_token = $refresh_token;
 
         return $this;
     }
