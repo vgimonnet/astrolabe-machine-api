@@ -34,19 +34,22 @@ class ApiUserController extends AbstractController
         $em = $this->getDoctrine()->getManager();
 
         if($request->get('username') != null && $request->get('password') != null) {
-            // $user = $em->getRepository(User::class)->findByUsernameAndPassword($request->get('username'), $request->get('username'));
-            // $repository = $this->getDoctrine()->getRepository(User::class);
-            $plainPassword = $request->get('password');
-            $options = [
-                'cost' => 12,
-            ];
-            if(password_verify($plainPassword, password_hash($plainPassword, PASSWORD_BCRYPT, $options))) {
-                return $this->json(['error' => 'Mot de passe ou identifiant invalide']);    
+            $user = $em->getRepository(User::class)->findOneBy(array('username' => $request->get('username'), 'password' => $request->get('password')));
+            if($user != null) {
+                $plainPassword = $request->get('password');
+                $options = [
+                    'cost' => 12,
+                ];
+                if(password_verify($plainPassword, password_hash($plainPassword, PASSWORD_BCRYPT, $options))) {
+                    return $this->json(['message' => 'Connexion accepté']);    
+                } else {
+                    return $this->json(['error' => 'Mot de passe ou identifiant invalide 3']);    
+                }
             } else {
-                return $this->json(['error' => 'Mot de passe ou identifiant invalide']);    
-            }            
+                return $this->json(['error' => 'Mot de passe ou identifiant invalide 2']);    
+            }                    
         } else {
-            return $this->json(['error' => 'Mot de passe ou identifiant invalide']);
+            return $this->json(['error' => 'Mot de passe ou identifiant invalide 1']);
         }
     }
 
@@ -61,7 +64,6 @@ class ApiUserController extends AbstractController
             $user_exist = $em->getRepository(User::class)->findOneBy(array('username' => $request->get('username')));
             if($user_exist == null){
                 $user = new User();
-
                 $plainPassword = $request->get('password');
                 $options = [
                     'cost' => 12,
@@ -72,9 +74,9 @@ class ApiUserController extends AbstractController
                 $user->setIsAdmin(0);
                 $em->persist($user);
                 $em->flush();
-                return $this->json(['reponse' => "user n'existe pas"]);
+                return $this->json(['reponse' => "user créé"]);
             }
-            return $this->json(['reponse' => "user existe "]);    
+            return $this->json(['reponse' => "user existe deja "]);    
 
         }
         

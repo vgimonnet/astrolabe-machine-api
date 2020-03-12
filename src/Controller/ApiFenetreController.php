@@ -39,10 +39,10 @@ class ApiFenetreController extends AbstractController
             array_push($data, [
                 "id" => $fenetre->getId(),
                 "url" => $fenetre->getUrl(),
-                "widht" => $fenetre->getWidth(),
+                "width" => $fenetre->getWidth(),
                 "height" => $fenetre->getHeight(),
-                "posx" => $fenetre->getPosx(),
-                "posy" =>  $fenetre->getPosy(),
+                "posX" => $fenetre->getPosx(),
+                "posY" =>  $fenetre->getPosy(),
             ]);
         }
 
@@ -60,14 +60,14 @@ class ApiFenetreController extends AbstractController
         //Ajout d'une nouvelle fenêtre
         $em = $this->getDoctrine()->getManager();
 
-        if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posx') != null && $request->get('posy') != null )
+        if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null )
         {
             $fenetre = new Fenetre();
             $fenetre->setUrl($request->get('url'));
             $fenetre->setWidth($request->get('width'));
             $fenetre->setHeight($request->get('height'));
-            $fenetre->setPosx($request->get('posx'));
-            $fenetre->setPosy($request->get('posy'));
+            $fenetre->setPosx($request->get('posX'));
+            $fenetre->setPosy($request->get('posY'));
 
             $em->persist($fenetre);
             $em->flush();
@@ -85,15 +85,15 @@ class ApiFenetreController extends AbstractController
         //Mise à jour d'une fenêtre
         $em = $this->getDoctrine()->getManager();
 
-        if( $request->get('id') != null && $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posx') != null && $request->get('posy') != null )
+        if( $request->get('id') != null && $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null )
         {
             $fenetre = $em->getRepository(Fenetre::class)->find($request->get('id'));
             if($fenetre != null){
                 $fenetre->setUrl($request->get('url'));
                 $fenetre->setWidth($request->get('width'));
                 $fenetre->setHeight($request->get('height'));
-                $fenetre->setPosx($request->get('posx'));
-                $fenetre->setPosy($request->get('posy'));
+                $fenetre->setPosx($request->get('posX'));
+                $fenetre->setPosy($request->get('posY'));
 
                 $em->flush();
             } else {
