@@ -60,11 +60,10 @@ class ApiFenetreController extends AbstractController
 
             $em->persist($fenetre);
             $em->flush();
+            $data = ['reponse' => 'Fenêtre enregistrée avec succès'];
         } else {
            $data = ['reponse' => 'Erreur lors de l\'enregistrement de la fenêtre'];
         }
-        
-        $data = ['reponse' => 'Fenêtre enregistrée avec succès'];
         
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
@@ -91,13 +90,13 @@ class ApiFenetreController extends AbstractController
                 $fenetre->setPosy($request->get('posY'));
 
                 $em->flush();
+                $data = ['reponse' => 'Fenêtre modifiée avec succès'];
             } else {
                 $data = ['reponse' => 'Aucune fenêtre existante pour cet Id'];        
             }
         } else {
             $data = ['reponse' => 'Erreur lors de la modification de la fenêtre'];
-        }
-        $data = ['reponse' => 'Fenêtre modifiée avec succès'];
+        }        
 
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
@@ -120,13 +119,13 @@ class ApiFenetreController extends AbstractController
             if($fenetre != null){
                 $em->remove($fenetre);
                 $em->flush();
+                $data = ['reponse' => 'Fenêtre supprimée avec succès'];
             } else {
                 $data = ['reponse' => 'Aucune fenêtre existante pour cet Id'];        
             }
         } else {
             $data = ['reponse' => 'Erreur lors de la suppression de la fenêtre'];
-        }
-        $data = ['reponse' => 'Fenêtre supprimée avec succès'];
+        }        
 
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
