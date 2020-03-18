@@ -52,13 +52,13 @@ class ApiUserController extends AbstractController
 
                     $data = ['message' => $token];    
                 } else {
-                    $data = ['error' => 'Mot de passe invalide'];    
+                    $data = ['erreur' => 'Mot de passe invalide'];    
                 }
             } else {
-                $data = ['error' => 'Identifiant invalide'];    
+                $data = ['erreur' => 'Identifiant invalide'];    
             }                    
         } else {
-            $data = ['error' => 'Mot de passe ou identifiant invalide'];
+            $data = ['erreur' => 'Mot de passe ou identifiant invalide'];
         }
 
         $reponse = new Response();
@@ -91,10 +91,10 @@ class ApiUserController extends AbstractController
                 $em->flush();
                 $data = ['reponse' => "user créé"];
             } else {
-                $data = ['reponse' => "user existe deja "];    
+                $data = ['erreur' => "user existe deja "];    
             }            
         } else {
-            $data = ['reponse' => 'Mot de passe ou identifiant invalide'];
+            $data = ['erreur' => 'Mot de passe ou identifiant invalide'];
         }        
 
         $reponse = new Response();
@@ -115,7 +115,7 @@ class ApiUserController extends AbstractController
         if($authentification){
             $data = ['reponse' => "authentification réussie "];    
         } else {
-            $data = ['reponse' => "authentification échouée "];    
+            $data = ['erreur' => "authentification échouée "];    
         }
 
         $reponse = new Response();
