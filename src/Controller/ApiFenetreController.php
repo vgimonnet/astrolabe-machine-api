@@ -11,12 +11,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 
 /**
- * @Route("api/", name="api_fenetre")
+ * @Route("api/fenetre", name="api_fenetre")
  */
 class ApiFenetreController extends AbstractController
 {
     /**
-     * @Route("/get/fenetre", name="get_fenetre", methods={"GET"})
+     * @Route("/", name="get_fenetre", methods={"GET"})
      */
     public function getFenetre(Request $request){
         $data = [];
@@ -43,7 +43,7 @@ class ApiFenetreController extends AbstractController
     }
 
     /**
-     * @Route("/get/fenetre/{id}", name="get_fenetrebyid", methods={"GET"})
+     * @Route("/{id}", name="get_fenetrebyid", methods={"GET"})
      */
     public function getFenetreById(Request $request, $id){
         $data = [];
@@ -72,7 +72,7 @@ class ApiFenetreController extends AbstractController
     }
 
     /**
-     * @Route("/post/fenetre", name="post_fenetre", methods={"POST"})
+     * @Route("/", name="post_fenetre", methods={"POST"})
      */
     public function postFenetre(Request $request){
         $em = $this->getDoctrine()->getManager();
@@ -109,7 +109,7 @@ class ApiFenetreController extends AbstractController
     }
 
     /**
-     * @Route("/put/fenetre/{id}", name="put_fenetre", methods={"PUT"})
+     * @Route("/{id}", name="put_fenetre", methods={"PUT"})
      */
     public function putFenetre(Request $request, $id){
         $em = $this->getDoctrine()->getManager();
@@ -149,7 +149,7 @@ class ApiFenetreController extends AbstractController
     }
 
      /**
-     * @Route("/delete/fenetre/{id}", name="delete_fenetre", methods={"DELETE"})
+     * @Route("/{id}", name="delete_fenetre", methods={"DELETE"})
      */
     public function deleteFenetre(Request $request, $id){
         //Suppression d'une fenêtre
