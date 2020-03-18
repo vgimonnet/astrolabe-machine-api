@@ -113,7 +113,7 @@ class ApiFenetreController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $data = [];
 
-        if( $request->get('id') )
+        if( $request->get('id') != null)
         {
             $fenetre = $em->getRepository(Fenetre::class)->find($request->get('id'));
             if($fenetre != null){
