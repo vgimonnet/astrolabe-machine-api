@@ -11,12 +11,12 @@ use Symfony\Component\Routing\Annotation\Route;
 
 
 /**
- * @Route("api/fenetre", name="api_fenetre")
+ * @Route("api/", name="api_fenetre")
  */
 class ApiFenetreController extends AbstractController
 {
     /**
-     * @Route("/get", name="get_fenetre", methods={"GET"})
+     * @Route("/get/fenetre", name="get_fenetre", methods={"GET"})
      */
     public function getFenetre(Request $request){
         $data = [];
@@ -43,7 +43,36 @@ class ApiFenetreController extends AbstractController
     }
 
     /**
-     * @Route("/post", name="post_fenetre", methods={"POST"})
+     * @Route("/get/fenetre/{id}", name="get_fenetrebyid", methods={"GET"})
+     */
+    public function getFenetreById(Request $request, $id){
+        $data = [];
+        
+        $em = $this->getDoctrine()->getManager();
+
+        $fenetre = $em->getRepository(Fenetre::class)->find($id);
+        if($fenetre != null){
+            array_push($data, [
+                "id" => $fenetre->getId(),
+                "url" => $fenetre->getUrl(),
+                "width" => $fenetre->getWidth(),
+                "height" => $fenetre->getHeight(),
+                "posX" => $fenetre->getPosx(),
+                "posY" =>  $fenetre->getPosy(),
+            ]);
+        } else {
+            $data = ["erreur" => "Aucune fenêtre ne correspond à cet id"];
+        }            
+
+        $reponse = new Response();
+        $reponse->setContent(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse;
+    }
+
+    /**
+     * @Route("/post/fenetre", name="post_fenetre", methods={"POST"})
      */
     public function postFenetre(Request $request){
         $em = $this->getDoctrine()->getManager();
@@ -60,7 +89,14 @@ class ApiFenetreController extends AbstractController
 
             $em->persist($fenetre);
             $em->flush();
-            $data = ['reponse' => 'Fenêtre enregistrée avec succès'];
+            $data = [
+                "id" => $fenetre->getId(),
+                "url" => $fenetre->getUrl(),
+                "width" => $fenetre->getWidth(),
+                "height" => $fenetre->getHeight(),
+                "posX" => $fenetre->getPosx(),
+                "posY" =>  $fenetre->getPosy(),
+            ];
         } else {
            $data = ['erreur' => 'Erreur lors de l\'enregistrement de la fenêtre'];
         }
@@ -73,15 +109,15 @@ class ApiFenetreController extends AbstractController
     }
 
     /**
-     * @Route("/put", name="put_fenetre", methods={"PUT"})
+     * @Route("/put/fenetre/{id}", name="put_fenetre", methods={"PUT"})
      */
-    public function putFenetre(Request $request){
+    public function putFenetre(Request $request, $id){
         $em = $this->getDoctrine()->getManager();
         $data = [];
 
-        if( $request->get('id') != null && $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null )
+        if( $id != null && $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null )
         {
-            $fenetre = $em->getRepository(Fenetre::class)->find($request->get('id'));
+            $fenetre = $em->getRepository(Fenetre::class)->find($id);
             if($fenetre != null){
                 $fenetre->setUrl($request->get('url'));
                 $fenetre->setWidth($request->get('width'));
@@ -90,9 +126,16 @@ class ApiFenetreController extends AbstractController
                 $fenetre->setPosy($request->get('posY'));
 
                 $em->flush();
-                $data = ['reponse' => 'Fenêtre modifiée avec succès'];
+                $data = [
+                    "id" => $fenetre->getId(),
+                    "url" => $fenetre->getUrl(),
+                    "width" => $fenetre->getWidth(),
+                    "height" => $fenetre->getHeight(),
+                    "posX" => $fenetre->getPosx(),
+                    "posY" =>  $fenetre->getPosy(),
+                ];
             } else {
-                $data = ['erreur' => 'Aucune fenêtre existante pour cet Id'];        
+                $data = ['erreur' => 'Aucune fenêtre ne correspond à cet id'];        
             }
         } else {
             $data = ['erreur' => 'Erreur lors de la modification de la fenêtre'];
@@ -106,22 +149,22 @@ class ApiFenetreController extends AbstractController
     }
 
      /**
-     * @Route("/delete", name="delete_fenetre", methods={"DELETE"})
+     * @Route("/delete/fenetre/{id}", name="delete_fenetre", methods={"DELETE"})
      */
-    public function deleteFenetre(Request $request){
+    public function deleteFenetre(Request $request, $id){
         //Suppression d'une fenêtre
         $em = $this->getDoctrine()->getManager();
         $data = [];
 
-        if( $request->get('id') != null)
+        if( $id != null)
         {
-            $fenetre = $em->getRepository(Fenetre::class)->find($request->get('id'));
+            $fenetre = $em->getRepository(Fenetre::class)->find($id);
             if($fenetre != null){
                 $em->remove($fenetre);
                 $em->flush();
-                $data = ['reponse' => 'Fenêtre supprimée avec succès'];
+                $data = ['success' => 'Fenêtre supprimée avec succès'];
             } else {
-                $data = ['erreur' => 'Aucune fenêtre existante pour cet Id'];        
+                $data = ['erreur' => 'Aucune fenêtre ne correspond à cet id'];        
             }
         } else {
             $data = ['erreur' => 'Erreur lors de la suppression de la fenêtre'];

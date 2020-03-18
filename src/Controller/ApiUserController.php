@@ -50,7 +50,7 @@ class ApiUserController extends AbstractController
                     $em->persist($authentification);
                     $em->flush();
 
-                    $data = ['message' => $token];    
+                    $data = ['token' => $token];    
                 } else {
                     $data = ['erreur' => 'Mot de passe invalide'];    
                 }
@@ -89,7 +89,10 @@ class ApiUserController extends AbstractController
                 $user->setIsAdmin(0);
                 $em->persist($user);
                 $em->flush();
-                $data = ['reponse' => "user créé"];
+                $data = [
+                    'id' => $user->getId(),
+                    'username' => $user->getUsername(),
+                ];
             } else {
                 $data = ['erreur' => "user existe deja "];    
             }            
