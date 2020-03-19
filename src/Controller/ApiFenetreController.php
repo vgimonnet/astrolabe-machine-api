@@ -61,7 +61,7 @@ class ApiFenetreController extends AbstractController
                 "posY" =>  $fenetre->getPosy(),
             ]);
         } else {
-            $data = ["erreur" => "Aucune fenêtre ne correspond à cet id"];
+            $data = ["error" => "Aucune fenêtre ne correspond à cet id"];
         }            
 
         $reponse = new Response();
@@ -98,7 +98,7 @@ class ApiFenetreController extends AbstractController
                 "posY" =>  $fenetre->getPosy(),
             ];
         } else {
-           $data = ['erreur' => 'Erreur lors de l\'enregistrement de la fenêtre'];
+           $data = ['error' => 'Erreur lors de l\'enregistrement de la fenêtre'];
         }
         
         $reponse = new Response();
@@ -135,10 +135,10 @@ class ApiFenetreController extends AbstractController
                     "posY" =>  $fenetre->getPosy(),
                 ];
             } else {
-                $data = ['erreur' => 'Aucune fenêtre ne correspond à cet id'];        
+                $data = ['error' => 'Aucune fenêtre ne correspond à cet id'];        
             }
         } else {
-            $data = ['erreur' => 'Erreur lors de la modification de la fenêtre'];
+            $data = ['error' => 'Erreur lors de la modification de la fenêtre'];
         }        
 
         $reponse = new Response();
@@ -164,10 +164,10 @@ class ApiFenetreController extends AbstractController
                 $em->flush();
                 $data = ['success' => 'Fenêtre supprimée avec succès'];
             } else {
-                $data = ['erreur' => 'Aucune fenêtre ne correspond à cet id'];        
+                $data = ['error' => 'Aucune fenêtre ne correspond à cet id'];        
             }
         } else {
-            $data = ['erreur' => 'Erreur lors de la suppression de la fenêtre'];
+            $data = ['error' => 'Erreur lors de la suppression de la fenêtre'];
         }        
 
         $reponse = new Response();

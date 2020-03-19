@@ -52,13 +52,13 @@ class ApiUserController extends AbstractController
 
                     $data = ['token' => $token];    
                 } else {
-                    $data = ['erreur' => 'Mot de passe invalide'];    
+                    $data = ['error' => 'Mot de passe invalide'];    
                 }
             } else {
-                $data = ['erreur' => 'Identifiant invalide'];    
+                $data = ['error' => 'Identifiant invalide'];    
             }                    
         } else {
-            $data = ['erreur' => 'Mot de passe ou identifiant invalide'];
+            $data = ['error' => 'Mot de passe ou identifiant invalide'];
         }
 
         $reponse = new Response();
@@ -94,10 +94,10 @@ class ApiUserController extends AbstractController
                     'username' => $user->getUsername(),
                 ];
             } else {
-                $data = ['erreur' => "user existe deja "];    
+                $data = ['error' => "user existe deja "];    
             }            
         } else {
-            $data = ['erreur' => 'Mot de passe ou identifiant invalide'];
+            $data = ['error' => 'Mot de passe ou identifiant invalide'];
         }        
 
         $reponse = new Response();
@@ -116,9 +116,9 @@ class ApiUserController extends AbstractController
         // $token = $request->headers->get('X-Auth-Token');
         $authentification = $em->getRepository(Authentification::class)->findOneBy(array('token' => $request->headers->get('X-Auth-Token')));
         if($authentification){
-            $data = ['reponse' => "authentification réussie "];    
+            $data = ['success' => "authentification réussie "];    
         } else {
-            $data = ['erreur' => "authentification échouée "];    
+            $data = ['error' => "authentification échouée "];    
         }
 
         $reponse = new Response();
