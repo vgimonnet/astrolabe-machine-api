@@ -21,7 +21,7 @@ class ApiBackgroundController extends AbstractController
     public function getBackground(){
 
         $repository = $this->getDoctrine()->getRepository(Background::class);
-        $background = $repository->find($id);
+        $background = $repository->find(1);
 
         if(!is_null($background->getColor())) {
             $reponse = new Response(json_encode(array(
@@ -39,7 +39,7 @@ class ApiBackgroundController extends AbstractController
         }
         else{
             $reponse = new Response(json_encode(array(
-            'error'     => "Erreur de background en base";
+            'error'     => 'Erreur de background en base'
             )
             ));
             $reponse->headers->set("Content-Type", "application/json");
