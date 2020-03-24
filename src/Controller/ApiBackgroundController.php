@@ -56,30 +56,38 @@ class ApiBackgroundController extends AbstractController
         $data = [];
 
         //call $background ici 
-        //vérifier s'il est null 
-        //si null on null on le créer
+        $backgrounds = $em->getRepository(Background::class)->findAll();
+        if($backgrounds != null){ //vérifier s'il est n'est pas null, alors on prend le premier enregistrement
+            $background = $backgrounds[0];
+        } else { // sinon on en créer 
+            $background = new Background();
+        }
 
-        if(!is_null($request->get('color'))) {
-            $background = $em->getRepository(Background::class)->find(1);
+        $content = json_decode($request->getContent(), true);
+
+        if(!is_null($content['color']) && is_null($request->files->get('image'))) {
+            // $background = $em->getRepository(Background::class)->find(1);
             if($background != null){
-                $background->setColor($request->get('color'));
+                $background->setColor($content['color']);
                 $background->setImage(null);
+                $em->persist($background);
                 $em->flush();
                 $data = ['color' => $background->getColor()];
             } else {
                 $data = ['error' => 'Background introuvable en base'];        
             }
         }
-        elseif (!is_null($request->get('image'))) {
+        elseif (!is_null($request->get('image')) && is_null($content)) {
             
             $pic = $request->files->get('image');
             $pic_name = 'background.'.$pic->guessExtension();
             $pic->move("../public/images/", $pic_name);
 
-            $background = $em->getRepository(Background::class)->find(1);
+            // $background = $em->getRepository(Background::class)->find(1);
             if($background != null){
-               $background->setColor(null);
+                $background->setColor(null);
                 $background->setImage($pic_name);
+                $em->persist($background);
                 $em->flush();
                 $data = ['image' => $background->getImage()];
             } else {
