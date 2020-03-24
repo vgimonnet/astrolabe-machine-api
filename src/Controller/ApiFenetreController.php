@@ -114,16 +114,17 @@ class ApiFenetreController extends AbstractController
     public function putFenetre(Request $request, $id){
         $em = $this->getDoctrine()->getManager();
         $data = [];
+        $content = json_decode($request->getContent(), true);
 
-        if( $id != null && $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null )
+        if( $id != null && $content['url'] != null && $content['width'] != null && $content['height'] != null && $content['posX'] != null && $content['posY'] != null )
         {
             $fenetre = $em->getRepository(Fenetre::class)->find($id);
             if($fenetre != null){
-                $fenetre->setUrl($request->get('url'));
-                $fenetre->setWidth($request->get('width'));
-                $fenetre->setHeight($request->get('height'));
-                $fenetre->setPosx($request->get('posX'));
-                $fenetre->setPosy($request->get('posY'));
+                $fenetre->setUrl($content['url']);
+                $fenetre->setWidth($content['width']);
+                $fenetre->setHeight($content['height']);
+                $fenetre->setPosx($content['posX']);
+                $fenetre->setPosy($content['posY']);
 
                 $em->flush();
                 $data = [

@@ -55,6 +55,10 @@ class ApiBackgroundController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $data = [];
 
+        //call $background ici 
+        //vérifier s'il est null 
+        //si null on null on le créer
+
         if(!is_null($request->get('color'))) {
             $background = $em->getRepository(Background::class)->find(1);
             if($background != null){
