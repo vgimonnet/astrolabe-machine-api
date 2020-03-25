@@ -41,6 +41,11 @@ class Fenetre
      */
     private $posy;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $veille;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -102,6 +107,18 @@ class Fenetre
     public function setPosy(int $posy): self
     {
         $this->posy = $posy;
+
+        return $this;
+    }
+
+    public function getVeille(): ?bool
+    {
+        return $this->veille;
+    }
+
+    public function setVeille(bool $veille): self
+    {
+        $this->veille = $veille;
 
         return $this;
     }
