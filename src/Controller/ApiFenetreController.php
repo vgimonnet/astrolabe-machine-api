@@ -2,7 +2,9 @@
 
 namespace App\Controller;
 
+use App\Entity\Authentification;
 use App\Entity\Fenetre;
+use Doctrine\Migrations\Finder\Exception\FinderException;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -19,20 +21,33 @@ class ApiFenetreController extends AbstractController
      * @Route("/", name="get_fenetre", methods={"GET"})
      */
     public function getFenetre(Request $request){
-        $data = [];
-        
-        $em = $this->getDoctrine()->getManager();
 
-        $fenetres = $em->getRepository(Fenetre::class)->findAll();
-        foreach ($fenetres as $fenetre) {
-            array_push($data, [
-                "id" => $fenetre->getId(),
-                "url" => $fenetre->getUrl(),
-                "width" => $fenetre->getWidth(),
-                "height" => $fenetre->getHeight(),
-                "posX" => $fenetre->getPosx(),
-                "posY" =>  $fenetre->getPosy(),
-            ]);
+        $em = $this->getDoctrine()->getManager();
+        $data = []; 
+
+        if($request->headers->get('X-Auth-Token') !== null) {
+            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
+            if($authentication !== null) {
+                $fenetres = $em->getRepository(Fenetre::class)->findAll();
+                if($fenetres !== null) {
+                    foreach ($fenetres as $fenetre) {
+                        array_push($data, [
+                            "id" => $fenetre->getId(),
+                            "url" => $fenetre->getUrl(),
+                            "width" => $fenetre->getWidth(),
+                            "height" => $fenetre->getHeight(),
+                            "posX" => $fenetre->getPosx(),
+                            "posY" =>  $fenetre->getPosy(),
+                        ]);
+                    }
+                } else {
+                    $data = ["error" => "Aucune fenêtre enregistrée"];    
+                }                
+            } else {
+                $data = ["error" => "X-Auth-Token invalide"];
+            }
+        } else {
+            $data = ["error" => "X-Auth-Token est requis"];
         }
 
         $reponse = new Response();
@@ -40,6 +55,7 @@ class ApiFenetreController extends AbstractController
         $reponse->headers->set("Content-Type", "application/json");
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
         return $reponse;
+
     }
 
     /**
