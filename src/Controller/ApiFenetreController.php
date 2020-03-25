@@ -31,14 +31,17 @@ class ApiFenetreController extends AbstractController
                 $fenetres = $em->getRepository(Fenetre::class)->findAll();
                 if($fenetres !== null) {
                     foreach ($fenetres as $fenetre) {
-                        array_push($data, [
-                            "id" => $fenetre->getId(),
-                            "url" => $fenetre->getUrl(),
-                            "width" => $fenetre->getWidth(),
-                            "height" => $fenetre->getHeight(),
-                            "posX" => $fenetre->getPosx(),
-                            "posY" =>  $fenetre->getPosy(),
-                        ]);
+                        if(!$fenetre->getVeille()) {
+                            array_push($data, [
+                                "id" => $fenetre->getId(),
+                                "url" => $fenetre->getUrl(),
+                                "width" => $fenetre->getWidth(),
+                                "height" => $fenetre->getHeight(),
+                                "posX" => $fenetre->getPosx(),
+                                "posY" =>  $fenetre->getPosy(),
+                                "veille" =>  $fenetre->getVeille(),
+                            ]);
+                        }
                     }
                 } else {
                     $data = ["error" => "Aucune fenêtre enregistrée"];    
@@ -57,6 +60,51 @@ class ApiFenetreController extends AbstractController
         return $reponse;
 
     }
+
+    /**
+     * @Route("/veille", name="get_fenetre", methods={"GET"})
+     */
+    public function getFenetreVeille(Request $request){
+
+        $em = $this->getDoctrine()->getManager();
+        $data = []; 
+
+        if($request->headers->get('X-Auth-Token') !== null) {
+            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
+            if($authentication !== null) {
+                $fenetres = $em->getRepository(Fenetre::class)->findAll();
+                if($fenetres !== null) {
+                    foreach ($fenetres as $fenetre) {
+                        if($fenetre->getVeille()) {
+                            array_push($data, [
+                                "id" => $fenetre->getId(),
+                                "url" => $fenetre->getUrl(),
+                                "width" => $fenetre->getWidth(),
+                                "height" => $fenetre->getHeight(),
+                                "posX" => $fenetre->getPosx(),
+                                "posY" =>  $fenetre->getPosy(),
+                                "veille" =>  $fenetre->getVeille(),
+                            ]);
+                        }
+                    }
+                } else {
+                    $data = ["error" => "Aucune fenêtre enregistrée"];    
+                }                
+            } else {
+                $data = ["error" => "X-Auth-Token invalide"];
+            }
+        } else {
+            $data = ["error" => "X-Auth-Token est requis"];
+        }
+
+        $reponse = new Response();
+        $reponse->setContent(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse;
+
+    }
+
 
     /**
      * @Route("/{id}", name="get_fenetrebyid", methods={"GET"})
@@ -94,7 +142,7 @@ class ApiFenetreController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $data = [];
 
-        if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null )
+        if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null && $request->get('veille') != null )
         {
             $fenetre = new Fenetre();
             $fenetre->setUrl($request->get('url'));
@@ -102,6 +150,7 @@ class ApiFenetreController extends AbstractController
             $fenetre->setHeight($request->get('height'));
             $fenetre->setPosx($request->get('posX'));
             $fenetre->setPosy($request->get('posY'));
+            $fenetre->setVeille($request->get('veille'));
 
             $em->persist($fenetre);
             $em->flush();
@@ -112,6 +161,7 @@ class ApiFenetreController extends AbstractController
                 "height" => $fenetre->getHeight(),
                 "posX" => $fenetre->getPosx(),
                 "posY" =>  $fenetre->getPosy(),
+                "veille" =>  $fenetre->getVeille(),
             ];
         } else {
            $data = ['error' => 'Erreur lors de l\'enregistrement de la fenêtre'];
@@ -132,7 +182,7 @@ class ApiFenetreController extends AbstractController
         $data = [];
         $content = json_decode($request->getContent(), true);
 
-        if( $id != null && $content['url'] != null && $content['width'] != null && $content['height'] != null && $content['posX'] != null && $content['posY'] != null )
+        if( $id != null && $content['url'] != null && $content['width'] != null && $content['height'] != null && $content['posX'] != null && $content['posY'] != null && $request->get('veille') != null )
         {
             $fenetre = $em->getRepository(Fenetre::class)->find($id);
             if($fenetre != null){
@@ -141,6 +191,7 @@ class ApiFenetreController extends AbstractController
                 $fenetre->setHeight($content['height']);
                 $fenetre->setPosx($content['posX']);
                 $fenetre->setPosy($content['posY']);
+                $fenetre->setVeille($request->get('veille'));
 
                 $em->flush();
                 $data = [
@@ -150,6 +201,7 @@ class ApiFenetreController extends AbstractController
                     "height" => $fenetre->getHeight(),
                     "posX" => $fenetre->getPosx(),
                     "posY" =>  $fenetre->getPosy(),
+                    "veille" =>  $fenetre->getVeille(),
                 ];
             } else {
                 $data = ['error' => 'Aucune fenêtre ne correspond à cet id'];        
