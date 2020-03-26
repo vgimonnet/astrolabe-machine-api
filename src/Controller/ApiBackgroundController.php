@@ -55,10 +55,10 @@ class ApiBackgroundController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $data = [];
 
-        dump($request->getContent());
+        dump($request->getContentType());
         // dump(json_decode($request->getContent()));
         // dump(gettype($request->getContent()));
-        // die;
+        die;
         $image = imagecreatefromstring(base64_decode($request->getContent()));
         // dump($image);
         die;
