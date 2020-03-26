@@ -160,7 +160,9 @@ class ApiFenetreController extends AbstractController
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
         $reponse->headers->set("Content-Type", "application/json");
-        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");        
+        $reponse->headers->set("Access-Control-Allow-Methods", "DELETE, POST, GET, PUT");
+        $reponse->headers->set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Auth-Token");
         return $reponse;
     }
 
@@ -211,7 +213,9 @@ class ApiFenetreController extends AbstractController
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
         $reponse->headers->set("Content-Type", "application/json");
-        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");        
+        $reponse->headers->set("Access-Control-Allow-Methods", "DELETE, POST, GET, PUT");
+        $reponse->headers->set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Auth-Token");
         return $reponse;
     }
 
@@ -249,6 +253,8 @@ class ApiFenetreController extends AbstractController
         $reponse->setContent(json_encode($data));
         $reponse->headers->set("Content-Type", "application/json");
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        $reponse->headers->set("Access-Control-Allow-Methods", "DELETE, POST, GET, PUT");
+        $reponse->headers->set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Auth-Token");
         return $reponse;
     }
 }

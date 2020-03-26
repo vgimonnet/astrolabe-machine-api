@@ -55,6 +55,14 @@ class ApiBackgroundController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $data = [];
 
+        dump($request->getContent());
+        // dump(json_decode($request->getContent()));
+        // dump(gettype($request->getContent()));
+        // die;
+        $image = imagecreatefromstring(base64_decode($request->getContent()));
+        // dump($image);
+        die;
+
         //call $background ici 
         $backgrounds = $em->getRepository(Background::class)->findAll();
         if($backgrounds != null){ //vérifier s'il est n'est pas null, alors on prend le premier enregistrement
