@@ -116,4 +116,34 @@ class ApiBackgroundController extends AbstractController
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
         return $reponse;
     }
+
+    /**
+     * @Route("/test", name="test", methods={"POST"})
+     */
+    public function test(Request $request)
+    {
+        $em = $this->getDoctrine()->getManager();
+        // $token = $request->headers->get('X-Auth-Token');
+
+        if($request->files->get('pic') != null){
+            $pic = $request->files->get('pic');
+            $pic_name = 'test'.'.'.$pic->guessExtension();
+            $pic->move(
+                "../public/Images/",
+                $pic_name
+            );
+        }else{
+            $pic_name = 'fail/jpg';
+        } 
+
+        die;
+        
+
+        $data = [];
+        $reponse = new Response();
+        $reponse->setContent(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse; 
+    }
 }

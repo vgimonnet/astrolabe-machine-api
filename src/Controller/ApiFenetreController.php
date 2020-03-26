@@ -134,7 +134,7 @@ class ApiFenetreController extends AbstractController
                     $fenetre->setHeight($request->get('height'));
                     $fenetre->setPosx($request->get('posX'));
                     $fenetre->setPosy($request->get('posY'));
-                    $fenetre->setVeille($request->get('veille'));
+                    $request->get('veille') === 'false' ? $fenetre->setVeille(false) : $fenetre->setVeille(true); 
 
                     $em->persist($fenetre);
                     $em->flush();
@@ -148,7 +148,7 @@ class ApiFenetreController extends AbstractController
                         "veille" =>  $fenetre->getVeille(),
                     ];
                 } else {
-                $data = ['error' => 'Erreur lors de l\'enregistrement de la fenêtre'];
+                    $data = ['error' => 'Erreur lors de l\'enregistrement de la fenêtre'];
                 }
             } else {
                 $data = ["error" => "X-Auth-Token invalide"];
@@ -176,7 +176,7 @@ class ApiFenetreController extends AbstractController
         if($request->headers->get('X-Auth-Token') !== null) {
             $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
             if($authentication !== null) {
-                    if( $id != null && $content['url'] != null && $content['width'] != null && $content['height'] != null && $content['posX'] != null && $content['posY'] != null && $request->get('veille') != null )
+                    if( $id != null && $content['url'] != null && $content['width'] != null && $content['height'] != null && $content['posX'] != null && $content['posY'] != null && $content['veille'] != null )
                     {
                         $fenetre = $em->getRepository(Fenetre::class)->find($id);
                         if($fenetre != null){
@@ -185,7 +185,7 @@ class ApiFenetreController extends AbstractController
                             $fenetre->setHeight($content['height']);
                             $fenetre->setPosx($content['posX']);
                             $fenetre->setPosy($content['posY']);
-                            $fenetre->setVeille($request->get('veille'));
+                            $content['veille'] === 'false' ? $fenetre->setVeille(false) : $fenetre->setVeille(true); 
 
                             $em->flush();
                             $data = [
