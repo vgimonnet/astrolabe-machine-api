@@ -30,12 +30,16 @@ class ApiUserController extends AbstractController
             if($user != null) {
                 $plainPassword = $request->get('password');
                 if(password_verify($plainPassword, $user->getPassword())) {
-                    //Si un token est déjà associé à l'utilisateur on en créer un nouveau
+                    $authentification = null;
+
+                    //Si un token est déjà associé à l'utilisateur on le modifie
                     $authentification_exist = $em->getRepository(Authentification::class)->findOneBy(array('user' => $user->getId()));
                     if($authentification_exist){
-                        $em->remove($authentification_exist);
-                        $em->flush();
-                    }        
+                        $authentification = $authentification_exist;
+                    } else {
+                        $authentification = new Authentification(); 
+                        $authentification->setUser($user);
+                    }
                     
                     $options = [
                         'cost' => 12,
@@ -43,9 +47,7 @@ class ApiUserController extends AbstractController
                     $token = base64_encode(password_hash($request->get('username'), PASSWORD_BCRYPT, $options));
                     $token .= bin2hex(openssl_random_pseudo_bytes(50)); //revoir génération du token
 
-                    $authentification = new Authentification(); 
-                    $authentification->setUser($user);
-                    $authentification->setToken($token);
+                    $authentification->setToken($token);                    
 
                     $em->persist($authentification);
                     $em->flush();
