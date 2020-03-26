@@ -110,26 +110,45 @@ class ApiUserController extends AbstractController
     }
 
     /**
-     * @Route("/{id}", name="user_changepassword", methods={"PUT"})
+     * @Route("/changepassword", name="user_changepassword", methods={"POST"})
      */
-    public function changePassword(Request $request, $id){
+    public function changePassword(Request $request){
         $data = [];
         $em = $this->getDoctrine()->getManager();
-        if($id !== null && $request->get('password')) {
-            $user = $em->getRepository(User::class)->find($id);
-            if($user !== null) {
-                
+
+        if($request->headers->get('X-Auth-Token') !== null) {
+            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
+            if($authentication !== null) {
+                if ($request->get('password') !== null && $request->get('newpassword') !== null) {
+                    $user = $authentication->getUser();                
+                    if(password_verify($request->get('password'), $user->getPassword())) {
+                        $options = [
+                            'cost' => 12,
+                        ];
+                        $password = password_hash($request->get('newpassword'), PASSWORD_BCRYPT, $options);
+                        $user->setPassword($password);
+                        $em->persist($user);
+                $em->flush();
+                        $data = ['success' => 'Mot de passe changé avec succès'];
+                    } else {
+                        $data = ['error' => 'Mot de passe incorrect'];
+                    }
+                } else {
+                    $data = ["error" => "Le mot de passe actuel ou le nouveau mot de passe est invalide"];
+                }
             } else {
-                $data = ['error' => 'Utilisateur non trouvé en base'];
+                $data = ["error" => "X-Auth-Token invalide"];
             }
         } else {
-            $data = ['error' => 'Aucun utilisateur renseigné'];
+            $data = ["error" => "X-Auth-Token est requis"];
         }
 
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
         $reponse->headers->set("Content-Type", "application/json");
-        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");        
+        $reponse->headers->set("Access-Control-Allow-Methods", "DELETE, POST, GET, PUT");
+        $reponse->headers->set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Auth-Token");
         return $reponse;   
     }
 
