@@ -54,13 +54,18 @@ class ApiBackgroundController extends AbstractController
     public function putBackground(Request $request){
         $em = $this->getDoctrine()->getManager();
         $data = [];
-
-        dump($request->getContentType());
+        // dump($request->files->all());
+        // dump($request->getContent());
         // dump(json_decode($request->getContent()));
         // dump(gettype($request->getContent()));
-        die;
+        // die;
         $image = imagecreatefromstring(base64_decode($request->getContent()));
-        // dump($image);
+        // $image = imagecreatefromstring($request->getContent());
+        // dump($image->getData()->guessExtension());
+        // $pic_name = 'background.'.$pic->guessExtension();
+        // $pic->move("../public/images/", $pic_name);
+        
+        dump($image);
         die;
 
         //call $background ici 
