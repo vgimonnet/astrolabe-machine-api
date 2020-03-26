@@ -110,6 +110,30 @@ class ApiUserController extends AbstractController
     }
 
     /**
+     * @Route("/{id}", name="user_changepassword", methods={"PUT"})
+     */
+    public function changePassword(Request $request, $id){
+        $data = [];
+        $em = $this->getDoctrine()->getManager();
+        if($id !== null && $request->get('password')) {
+            $user = $em->getRepository(User::class)->find($id);
+            if($user !== null) {
+                
+            } else {
+                $data = ['error' => 'Utilisateur non trouvé en base'];
+            }
+        } else {
+            $data = ['error' => 'Aucun utilisateur renseigné'];
+        }
+
+        $reponse = new Response();
+        $reponse->setContent(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse;   
+    }
+
+    /**
      * @Route("/test", name="test", methods={"GET"})
      */
     public function test(Request $request)

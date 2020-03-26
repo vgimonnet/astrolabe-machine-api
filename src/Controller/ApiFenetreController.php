@@ -24,34 +24,24 @@ class ApiFenetreController extends AbstractController
 
         $em = $this->getDoctrine()->getManager();
         $data = []; 
-
-        if($request->headers->get('X-Auth-Token') !== null) {
-            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
-            if($authentication !== null) {
-                $fenetres = $em->getRepository(Fenetre::class)->findAll();
-                if($fenetres !== null) {
-                    foreach ($fenetres as $fenetre) {
-                        if(!$fenetre->getVeille()) {
-                            array_push($data, [
-                                "id" => $fenetre->getId(),
-                                "url" => $fenetre->getUrl(),
-                                "width" => $fenetre->getWidth(),
-                                "height" => $fenetre->getHeight(),
-                                "posX" => $fenetre->getPosx(),
-                                "posY" =>  $fenetre->getPosy(),
-                                "veille" =>  $fenetre->getVeille(),
-                            ]);
-                        }
-                    }
-                } else {
-                    $data = ["error" => "Aucune fenêtre enregistrée"];    
-                }                
-            } else {
-                $data = ["error" => "X-Auth-Token invalide"];
+        $fenetres = $em->getRepository(Fenetre::class)->findAll();
+        if($fenetres !== null) {
+            foreach ($fenetres as $fenetre) {
+                if(!$fenetre->getVeille()) {
+                    array_push($data, [
+                        "id" => $fenetre->getId(),
+                        "url" => $fenetre->getUrl(),
+                        "width" => $fenetre->getWidth(),
+                        "height" => $fenetre->getHeight(),
+                        "posX" => $fenetre->getPosx(),
+                        "posY" =>  $fenetre->getPosy(),
+                        "veille" =>  $fenetre->getVeille(),
+                    ]);
+                }
             }
         } else {
-            $data = ["error" => "X-Auth-Token est requis"];
-        }
+            $data = ["error" => "Aucune fenêtre enregistrée"];    
+        }   
 
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
@@ -62,40 +52,31 @@ class ApiFenetreController extends AbstractController
     }
 
     /**
-     * @Route("/veille", name="get_fenetre", methods={"GET"})
+     * @Route("/veille", name="get_fenetreveille", methods={"GET"})
      */
     public function getFenetreVeille(Request $request){
 
         $em = $this->getDoctrine()->getManager();
         $data = []; 
 
-        if($request->headers->get('X-Auth-Token') !== null) {
-            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
-            if($authentication !== null) {
-                $fenetres = $em->getRepository(Fenetre::class)->findAll();
-                if($fenetres !== null) {
-                    foreach ($fenetres as $fenetre) {
-                        if($fenetre->getVeille()) {
-                            array_push($data, [
-                                "id" => $fenetre->getId(),
-                                "url" => $fenetre->getUrl(),
-                                "width" => $fenetre->getWidth(),
-                                "height" => $fenetre->getHeight(),
-                                "posX" => $fenetre->getPosx(),
-                                "posY" =>  $fenetre->getPosy(),
-                                "veille" =>  $fenetre->getVeille(),
-                            ]);
-                        }
-                    }
-                } else {
-                    $data = ["error" => "Aucune fenêtre enregistrée"];    
-                }                
-            } else {
-                $data = ["error" => "X-Auth-Token invalide"];
+        $fenetres = $em->getRepository(Fenetre::class)->findAll();
+        if($fenetres !== null) {
+            foreach ($fenetres as $fenetre) {
+                if($fenetre->getVeille()) {
+                    array_push($data, [
+                        "id" => $fenetre->getId(),
+                        "url" => $fenetre->getUrl(),
+                        "width" => $fenetre->getWidth(),
+                        "height" => $fenetre->getHeight(),
+                        "posX" => $fenetre->getPosx(),
+                        "posY" =>  $fenetre->getPosy(),
+                        "veille" =>  $fenetre->getVeille(),
+                    ]);
+                }
             }
         } else {
-            $data = ["error" => "X-Auth-Token est requis"];
-        }
+            $data = ["error" => "Aucune fenêtre enregistrée"];    
+        }  
 
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
@@ -126,7 +107,7 @@ class ApiFenetreController extends AbstractController
             ]);
         } else {
             $data = ["error" => "Aucune fenêtre ne correspond à cet id"];
-        }            
+        }      
 
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
@@ -142,29 +123,38 @@ class ApiFenetreController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $data = [];
 
-        if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null && $request->get('veille') != null )
-        {
-            $fenetre = new Fenetre();
-            $fenetre->setUrl($request->get('url'));
-            $fenetre->setWidth($request->get('width'));
-            $fenetre->setHeight($request->get('height'));
-            $fenetre->setPosx($request->get('posX'));
-            $fenetre->setPosy($request->get('posY'));
-            $fenetre->setVeille($request->get('veille'));
+        if($request->headers->get('X-Auth-Token') !== null) {
+            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
+            if($authentication !== null) {
+                if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null && $request->get('veille') != null )
+                {
+                    $fenetre = new Fenetre();
+                    $fenetre->setUrl($request->get('url'));
+                    $fenetre->setWidth($request->get('width'));
+                    $fenetre->setHeight($request->get('height'));
+                    $fenetre->setPosx($request->get('posX'));
+                    $fenetre->setPosy($request->get('posY'));
+                    $fenetre->setVeille($request->get('veille'));
 
-            $em->persist($fenetre);
-            $em->flush();
-            $data = [
-                "id" => $fenetre->getId(),
-                "url" => $fenetre->getUrl(),
-                "width" => $fenetre->getWidth(),
-                "height" => $fenetre->getHeight(),
-                "posX" => $fenetre->getPosx(),
-                "posY" =>  $fenetre->getPosy(),
-                "veille" =>  $fenetre->getVeille(),
-            ];
+                    $em->persist($fenetre);
+                    $em->flush();
+                    $data = [
+                        "id" => $fenetre->getId(),
+                        "url" => $fenetre->getUrl(),
+                        "width" => $fenetre->getWidth(),
+                        "height" => $fenetre->getHeight(),
+                        "posX" => $fenetre->getPosx(),
+                        "posY" =>  $fenetre->getPosy(),
+                        "veille" =>  $fenetre->getVeille(),
+                    ];
+                } else {
+                $data = ['error' => 'Erreur lors de l\'enregistrement de la fenêtre'];
+                }
+            } else {
+                $data = ["error" => "X-Auth-Token invalide"];
+            }
         } else {
-           $data = ['error' => 'Erreur lors de l\'enregistrement de la fenêtre'];
+            $data = ["error" => "X-Auth-Token est requis"];
         }
         
         $reponse = new Response();
@@ -181,34 +171,42 @@ class ApiFenetreController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $data = [];
         $content = json_decode($request->getContent(), true);
+        if($request->headers->get('X-Auth-Token') !== null) {
+            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
+            if($authentication !== null) {
+                    if( $id != null && $content['url'] != null && $content['width'] != null && $content['height'] != null && $content['posX'] != null && $content['posY'] != null && $request->get('veille') != null )
+                    {
+                        $fenetre = $em->getRepository(Fenetre::class)->find($id);
+                        if($fenetre != null){
+                            $fenetre->setUrl($content['url']);
+                            $fenetre->setWidth($content['width']);
+                            $fenetre->setHeight($content['height']);
+                            $fenetre->setPosx($content['posX']);
+                            $fenetre->setPosy($content['posY']);
+                            $fenetre->setVeille($request->get('veille'));
 
-        if( $id != null && $content['url'] != null && $content['width'] != null && $content['height'] != null && $content['posX'] != null && $content['posY'] != null && $request->get('veille') != null )
-        {
-            $fenetre = $em->getRepository(Fenetre::class)->find($id);
-            if($fenetre != null){
-                $fenetre->setUrl($content['url']);
-                $fenetre->setWidth($content['width']);
-                $fenetre->setHeight($content['height']);
-                $fenetre->setPosx($content['posX']);
-                $fenetre->setPosy($content['posY']);
-                $fenetre->setVeille($request->get('veille'));
-
-                $em->flush();
-                $data = [
-                    "id" => $fenetre->getId(),
-                    "url" => $fenetre->getUrl(),
-                    "width" => $fenetre->getWidth(),
-                    "height" => $fenetre->getHeight(),
-                    "posX" => $fenetre->getPosx(),
-                    "posY" =>  $fenetre->getPosy(),
-                    "veille" =>  $fenetre->getVeille(),
-                ];
+                            $em->flush();
+                            $data = [
+                                "id" => $fenetre->getId(),
+                                "url" => $fenetre->getUrl(),
+                                "width" => $fenetre->getWidth(),
+                                "height" => $fenetre->getHeight(),
+                                "posX" => $fenetre->getPosx(),
+                                "posY" =>  $fenetre->getPosy(),
+                                "veille" =>  $fenetre->getVeille(),
+                            ];
+                    } else {
+                        $data = ['error' => 'Aucune fenêtre ne correspond à cet id'];        
+                    }
+                } else {
+                    $data = ['error' => 'Erreur lors de la modification de la fenêtre'];
+                }        
             } else {
-                $data = ['error' => 'Aucune fenêtre ne correspond à cet id'];        
+                $data = ["error" => "X-Auth-Token invalide"];
             }
         } else {
-            $data = ['error' => 'Erreur lors de la modification de la fenêtre'];
-        }        
+            $data = ["error" => "X-Auth-Token est requis"];
+        }
 
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
@@ -224,20 +222,28 @@ class ApiFenetreController extends AbstractController
         //Suppression d'une fenêtre
         $em = $this->getDoctrine()->getManager();
         $data = [];
-
-        if( $id != null)
-        {
-            $fenetre = $em->getRepository(Fenetre::class)->find($id);
-            if($fenetre != null){
-                $em->remove($fenetre);
-                $em->flush();
-                $data = ['success' => 'Fenêtre supprimée avec succès'];
+        if($request->headers->get('X-Auth-Token') !== null) {
+            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
+            if($authentication !== null) {
+                if( $id != null)
+                {
+                    $fenetre = $em->getRepository(Fenetre::class)->find($id);
+                    if($fenetre != null){
+                        $em->remove($fenetre);
+                        $em->flush();
+                        $data = ['success' => 'Fenêtre supprimée avec succès'];
+                    } else {
+                        $data = ['error' => 'Aucune fenêtre ne correspond à cet id'];        
+                    }
+                } else {
+                    $data = ['error' => 'Erreur lors de la suppression de la fenêtre'];
+                }    
             } else {
-                $data = ['error' => 'Aucune fenêtre ne correspond à cet id'];        
+                $data = ["error" => "X-Auth-Token invalide"];
             }
         } else {
-            $data = ['error' => 'Erreur lors de la suppression de la fenêtre'];
-        }        
+            $data = ["error" => "X-Auth-Token est requis"];
+        }    
 
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
