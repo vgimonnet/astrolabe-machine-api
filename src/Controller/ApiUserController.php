@@ -151,25 +151,4 @@ class ApiUserController extends AbstractController
         $reponse->headers->set("Access-Control-Allow-Headers", "Content-Type, Access-Control-Allow-Headers, Authorization, X-Auth-Token");
         return $reponse;   
     }
-
-    /**
-     * @Route("/test", name="test", methods={"GET"})
-     */
-    public function test(Request $request)
-    {
-        $em = $this->getDoctrine()->getManager();
-        // $token = $request->headers->get('X-Auth-Token');
-        $authentification = $em->getRepository(Authentification::class)->findOneBy(array('token' => $request->headers->get('X-Auth-Token')));
-        if($authentification){
-            $data = ['success' => "authentification réussie "];    
-        } else {
-            $data = ['error' => "authentification échouée "];    
-        }
-
-        $reponse = new Response();
-        $reponse->setContent(json_encode($data));
-        $reponse->headers->set("Content-Type", "application/json");
-        $reponse->headers->set("Access-Control-Allow-Origin", "*");
-        return $reponse; 
-    }
 }
