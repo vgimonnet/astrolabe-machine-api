@@ -46,6 +46,16 @@ class Fenetre
      */
     private $veille;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $is_youtube;
+
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $is_playlist;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -119,6 +129,30 @@ class Fenetre
     public function setVeille(bool $veille): self
     {
         $this->veille = $veille;
+
+        return $this;
+    }
+
+    public function getIsYoutube(): ?bool
+    {
+        return $this->is_youtube;
+    }
+
+    public function setIsYoutube(bool $is_youtube): self
+    {
+        $this->is_youtube = $is_youtube;
+
+        return $this;
+    }
+
+    public function getIsPlaylist(): ?bool
+    {
+        return $this->is_playlist;
+    }
+
+    public function setIsPlaylist(bool $is_playlist): self
+    {
+        $this->is_playlist = $is_playlist;
 
         return $this;
     }
