@@ -26,6 +26,11 @@ class Background
      */
     private $image;
 
+    /**
+     * @ORM\Column(type="boolean")
+     */
+    private $veille;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -51,6 +56,18 @@ class Background
     public function setImage(?string $image): self
     {
         $this->image = $image;
+
+        return $this;
+    }
+
+    public function getVeille(): ?bool
+    {
+        return $this->veille;
+    }
+
+    public function setVeille(bool $veille): self
+    {
+        $this->veille = $veille;
 
         return $this;
     }

@@ -21,7 +21,7 @@ class ApiBackgroundController extends AbstractController
     public function getBackground(){
 
         $repository = $this->getDoctrine()->getRepository(Background::class);
-        $background = $repository->find(1);
+        $background = $repository->findOneBy(array('veille' => 0));
 
         if(!is_null($background->getColor())) {
             $reponse = new Response(json_encode(array(
@@ -49,9 +49,42 @@ class ApiBackgroundController extends AbstractController
     }
 
     /**
-     * @Route("/", name="put_background", methods={"PUT"})
+     * @Route("/veille/", name="get_background_veille", methods={"GET"})
      */
-    public function putBackground(Request $request){
+    public function getBackgroundVeille(){
+
+        $repository = $this->getDoctrine()->getRepository(Background::class);
+        $background = $repository->findOneBy(array('veille' => 1));
+
+        if(!is_null($background->getColor())) {
+            $reponse = new Response(json_encode(array(
+            'color'     => $background->getColor()
+            )
+            ));
+
+            $reponse->headers->set("Content-Type", "application/json");
+            $reponse->headers->set("Access-Control-Allow-Origin", "*");
+            return $reponse;
+        }
+        elseif (!is_null($background->getImage())) {
+            $file = "../public/images/".$background->getImage();
+            return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file);
+        }
+        else{
+            $reponse = new Response(json_encode(array(
+            'error'     => 'Erreur de background en base'
+            )
+            ));
+            $reponse->headers->set("Content-Type", "application/json");
+            $reponse->headers->set("Access-Control-Allow-Origin", "*");
+            return $reponse;
+        }
+    }
+
+    /**
+     * @Route("/", name="post_background", methods={"POST"})
+     */
+    public function postBackground(Request $request){
         $em = $this->getDoctrine()->getManager();
         $data = [];
         // dump($request->files->all());
@@ -68,49 +101,62 @@ class ApiBackgroundController extends AbstractController
         dump($image);
         die;
 
-        //call $background ici 
-        $backgrounds = $em->getRepository(Background::class)->findAll();
-        if($backgrounds != null){ //vérifier s'il est n'est pas null, alors on prend le premier enregistrement
-            $background = $backgrounds[0];
-        } else { // sinon on en créer 
-            $background = new Background();
-        }
+        if($request->headers->get('X-Auth-Token') !== null) {
+            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
+            if($authentication !== null) {
+                //call $background ici 
+                /*$backgrounds = $em->getRepository(Background::class)->findAll();
+                if($backgrounds != null){ //vérifier s'il est n'est pas null, alors on prend le premier enregistrement
+                    $background = $backgrounds[0];
+                } else { // sinon on en créer 
+                    $background = new Background();
+                }*/
+                if($content['veille'] == null) {
+                    $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 0));
+                } else {
+                    $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 1));
+                }
 
-        $content = json_decode($request->getContent(), true);
+                $content = json_decode($request->getContent(), true);
 
-        if(!is_null($content['color']) && is_null($request->files->get('image'))) {
-            // $background = $em->getRepository(Background::class)->find(1);
-            if($background != null){
-                $background->setColor($content['color']);
-                $background->setImage(null);
-                $em->persist($background);
-                $em->flush();
-                $data = ['color' => $background->getColor()];
+                if(!is_null($content['color']) && is_null($request->files->get('image'))) {
+                    // $background = $em->getRepository(Background::class)->find(1);
+                    if($background != null){
+                        $background->setColor($content['color']);
+                        $background->setImage(null);
+                        $em->persist($background);
+                        $em->flush();
+                        $data = ['color' => $background->getColor()];
+                    } else {
+                        $data = ['error' => 'Background introuvable en base'];        
+                    }
+                }
+                elseif (!is_null($request->get('image')) && is_null($content)) {
+                    
+                    $pic = $request->files->get('image');
+                    $pic_name = 'background.'.$pic->guessExtension();
+                    $pic->move("../public/images/", $pic_name);
+
+                    // $background = $em->getRepository(Background::class)->find(1);
+                    if($background != null){
+                        $background->setColor(null);
+                        $background->setImage($pic_name);
+                        $em->persist($background);
+                        $em->flush();
+                        $data = ['image' => $background->getImage()];
+                    } else {
+                        $data = ['error' => 'Background introuvable en base'];        
+                    }   
+                }
+                else{
+                    $data = ['error' => 'Erreur de requête Background'];
+                }
             } else {
-                $data = ['error' => 'Background introuvable en base'];        
+                $data = ["error" => "X-Auth-Token invalide"];
             }
+        } else {
+            $data = ["error" => "X-Auth-Token est requis"];
         }
-        elseif (!is_null($request->get('image')) && is_null($content)) {
-            
-            $pic = $request->files->get('image');
-            $pic_name = 'background.'.$pic->guessExtension();
-            $pic->move("../public/images/", $pic_name);
-
-            // $background = $em->getRepository(Background::class)->find(1);
-            if($background != null){
-                $background->setColor(null);
-                $background->setImage($pic_name);
-                $em->persist($background);
-                $em->flush();
-                $data = ['image' => $background->getImage()];
-            } else {
-                $data = ['error' => 'Background introuvable en base'];        
-            }   
-        }
-        else{
-            $data = ['error' => 'Erreur de requête Background'];
-        }
-
         $reponse = new Response(json_encode($data));
         $reponse->headers->set("Content-Type", "application/json");
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
