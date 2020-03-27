@@ -36,6 +36,8 @@ class ApiFenetreController extends AbstractController
                         "posX" => $fenetre->getPosx(),
                         "posY" =>  $fenetre->getPosy(),
                         "veille" =>  $fenetre->getVeille(),
+                        "youtube" =>  $fenetre->getIsYoutube(),
+                        "playlist" =>  $fenetre->getIsPlaylist(),
                     ]);
                 }
             }
@@ -71,6 +73,8 @@ class ApiFenetreController extends AbstractController
                         "posX" => $fenetre->getPosx(),
                         "posY" =>  $fenetre->getPosy(),
                         "veille" =>  $fenetre->getVeille(),
+                        "youtube" =>  $fenetre->getIsYoutube(),
+                        "playlist" =>  $fenetre->getIsPlaylist(),
                     ]);
                 }
             }
@@ -104,6 +108,9 @@ class ApiFenetreController extends AbstractController
                 "height" => $fenetre->getHeight(),
                 "posX" => $fenetre->getPosx(),
                 "posY" =>  $fenetre->getPosy(),
+                "veille" =>  $fenetre->getVeille(),
+                "youtube" =>  $fenetre->getIsYoutube(),
+                "playlist" =>  $fenetre->getIsPlaylist(),
             ]);
         } else {
             $data = ["error" => "Aucune fenêtre ne correspond à cet id"];
@@ -126,7 +133,7 @@ class ApiFenetreController extends AbstractController
         if($request->headers->get('X-Auth-Token') !== null) {
             $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
             if($authentication !== null) {
-                if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null && $request->get('veille') != null )
+                if( $request->get('url') != null && $request->get('width') != null && $request->get('height') != null && $request->get('posX') != null && $request->get('posY') != null && $request->get('veille') != null && $request->get('youtube') != null && $request->get('playlist') != null )
                 {
                     $fenetre = new Fenetre();
                     $fenetre->setUrl($request->get('url'));
@@ -134,7 +141,9 @@ class ApiFenetreController extends AbstractController
                     $fenetre->setHeight($request->get('height'));
                     $fenetre->setPosx($request->get('posX'));
                     $fenetre->setPosy($request->get('posY'));
-                    $request->get('veille') === 'false' ? $fenetre->setVeille(false) : $fenetre->setVeille(true); 
+                    $request->get('veille') === 'false' ? $fenetre->setVeille(false) : $fenetre->setVeille(true);
+                    $request->get('youtube') === 'false' ? $fenetre->setIsYoutube(false) : $fenetre->setIsYoutube(true); 
+                    $request->get('playlist') === 'false' ? $fenetre->setIsPlaylist(false) : $fenetre->setIsPlaylist(true); 
 
                     $em->persist($fenetre);
                     $em->flush();
@@ -146,6 +155,8 @@ class ApiFenetreController extends AbstractController
                         "posX" => $fenetre->getPosx(),
                         "posY" =>  $fenetre->getPosy(),
                         "veille" =>  $fenetre->getVeille(),
+                        "youtube" =>  $fenetre->getIsYoutube(),
+                        "playlist" =>  $fenetre->getIsPlaylist(),
                     ];
                 } else {
                     $data = ['error' => 'Erreur lors de l\'enregistrement de la fenêtre'];
@@ -185,7 +196,9 @@ class ApiFenetreController extends AbstractController
                             $fenetre->setHeight($content['height']);
                             $fenetre->setPosx($content['posX']);
                             $fenetre->setPosy($content['posY']);
-                            $content['veille'] === 'false' ? $fenetre->setVeille(false) : $fenetre->setVeille(true); 
+                            $content['veille'] === 'false' ? $fenetre->setVeille(false) : $fenetre->setVeille(true);
+                            $content['youtube'] === 'false' ? $fenetre->setIsYoutube(false) : $fenetre->setIsYoutube(true); 
+                            $content['playlist'] === 'false' ? $fenetre->setIsPlaylist(false) : $fenetre->setIsPlaylist(true); 
 
                             $em->flush();
                             $data = [
@@ -196,6 +209,8 @@ class ApiFenetreController extends AbstractController
                                 "posX" => $fenetre->getPosx(),
                                 "posY" =>  $fenetre->getPosy(),
                                 "veille" =>  $fenetre->getVeille(),
+                                "youtube" =>  $fenetre->getIsYoutube(),
+                                "playlist" =>  $fenetre->getIsPlaylist(),
                             ];
                     } else {
                         $data = ['error' => 'Aucune fenêtre ne correspond à cet id'];        
