@@ -2,6 +2,7 @@
 
 namespace App\Controller;
 
+use App\Entity\Authentification;
 use App\Entity\Background;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -34,7 +35,7 @@ class ApiBackgroundController extends AbstractController
             return $reponse;
         }
         elseif (!is_null($background->getImage())) {
-            $file = "../public/images/".$background->getImage();
+            $file = "../public/Images/".$background->getImage();
             return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file);
         }
         else{
@@ -67,7 +68,7 @@ class ApiBackgroundController extends AbstractController
             return $reponse;
         }
         elseif (!is_null($background->getImage())) {
-            $file = "../public/images/".$background->getImage();
+            $file = "../public/Images/".$background->getImage();
             return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file);
         }
         else{
@@ -87,69 +88,42 @@ class ApiBackgroundController extends AbstractController
     public function postBackground(Request $request){
         $em = $this->getDoctrine()->getManager();
         $data = [];
-        // dump($request->files->all());
-        // dump($request->getContent());
-        // dump(json_decode($request->getContent()));
-        // dump(gettype($request->getContent()));
-        // die;
-        $image = imagecreatefromstring(base64_decode($request->getContent()));
-        // $image = imagecreatefromstring($request->getContent());
-        // dump($image->getData()->guessExtension());
-        // $pic_name = 'background.'.$pic->guessExtension();
-        // $pic->move("../public/images/", $pic_name);
-        
-        dump($image);
-        die;
+        $background = null;
+        $veille = "";
 
         if($request->headers->get('X-Auth-Token') !== null) {
             $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
             if($authentication !== null) {
-                //call $background ici 
-                /*$backgrounds = $em->getRepository(Background::class)->findAll();
-                if($backgrounds != null){ //vérifier s'il est n'est pas null, alors on prend le premier enregistrement
-                    $background = $backgrounds[0];
-                } else { // sinon on en créer 
-                    $background = new Background();
-                }*/
-                if($content['veille'] == null) {
+                if($request->get('veille') === 'false') {
                     $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 0));
-                } else {
+                } elseif ($request->get('veille') === 'true'){
                     $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 1));
+                    $veille = "_veille";
                 }
-
-                $content = json_decode($request->getContent(), true);
-
-                if(!is_null($content['color']) && is_null($request->files->get('image'))) {
-                    // $background = $em->getRepository(Background::class)->find(1);
-                    if($background != null){
-                        $background->setColor($content['color']);
+                $pic = $request->files->get('image');
+                $color = $request->get('color');                
+                
+                if($background !== null) {
+                    if($color !== null && $pic === null) {
+                        $background->setColor($color);
                         $background->setImage(null);
                         $em->persist($background);
                         $em->flush();
                         $data = ['color' => $background->getColor()];
-                    } else {
-                        $data = ['error' => 'Background introuvable en base'];        
                     }
-                }
-                elseif (!is_null($request->get('image')) && is_null($content)) {
-                    
-                    $pic = $request->files->get('image');
-                    $pic_name = 'background.'.$pic->guessExtension();
-                    $pic->move("../public/images/", $pic_name);
-
-                    // $background = $em->getRepository(Background::class)->find(1);
-                    if($background != null){
+                    elseif ($color === null && $pic !== null) {
+                        $pic_name = 'background'.$veille.".".$pic->guessExtension();
+                        $pic->move("../public/Images/", $pic_name);    
                         $background->setColor(null);
                         $background->setImage($pic_name);
                         $em->persist($background);
                         $em->flush();
                         $data = ['image' => $background->getImage()];
                     } else {
-                        $data = ['error' => 'Background introuvable en base'];        
-                    }   
-                }
-                else{
-                    $data = ['error' => 'Erreur de requête Background'];
+                        $data = ["error" => "Erreur requête background"];
+                    }
+                } else{
+                    $data = ['error' => 'Background introuvable en base'];
                 }
             } else {
                 $data = ["error" => "X-Auth-Token invalide"];
@@ -161,35 +135,5 @@ class ApiBackgroundController extends AbstractController
         $reponse->headers->set("Content-Type", "application/json");
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
         return $reponse;
-    }
-
-    /**
-     * @Route("/test", name="test", methods={"POST"})
-     */
-    public function test(Request $request)
-    {
-        $em = $this->getDoctrine()->getManager();
-        // $token = $request->headers->get('X-Auth-Token');
-
-        if($request->files->get('pic') != null){
-            $pic = $request->files->get('pic');
-            $pic_name = 'test'.'.'.$pic->guessExtension();
-            $pic->move(
-                "../public/Images/",
-                $pic_name
-            );
-        }else{
-            $pic_name = 'fail/jpg';
-        } 
-
-        die;
-        
-
-        $data = [];
-        $reponse = new Response();
-        $reponse->setContent(json_encode($data));
-        $reponse->headers->set("Content-Type", "application/json");
-        $reponse->headers->set("Access-Control-Allow-Origin", "*");
-        return $reponse; 
     }
 }
