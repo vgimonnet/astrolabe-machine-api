@@ -96,8 +96,17 @@ class ApiBackgroundController extends AbstractController
             if($authentication !== null) {
                 if($request->get('veille') === 'false') {
                     $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 0));
+                    if($background === null) {
+                        $background = new Background();
+                        $background->setVeille(0);
+                    }
+
                 } elseif ($request->get('veille') === 'true'){
                     $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 1));
+                    if($background === null) {
+                        $background = new Background();
+                        $background->setVeille(1);
+                    }
                     $veille = "_veille";
                 }
                 $pic = $request->files->get('image');
