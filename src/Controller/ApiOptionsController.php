@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Authentification;
-use App\Entity\Background;
+use App\Entity\Options;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,21 +12,21 @@ use Symfony\Component\Routing\Annotation\Route;;
 
 
 /**
- * @Route("/api/background", name="api_background")
+ * @Route("/api/options", name="api_options")
  */
-class ApiBackgroundController extends AbstractController
+class ApiOptionsController extends AbstractController
 {
     /**
-     * @Route("/", name="get_background", methods={"GET"})
+     * @Route("/", name="get_options", methods={"GET"})
      */
-    public function getBackground(){
+    public function getOptions(){
 
-        $repository = $this->getDoctrine()->getRepository(Background::class);
-        $background = $repository->findOneBy(array('veille' => 0));
+        $repository = $this->getDoctrine()->getRepository(Options::class);
+        $options = $repository->findOneBy(array('veille' => 0));
 
-        if(!is_null($background->getColor())) {
+        if(!is_null($options->getColor())) {
             $reponse = new Response(json_encode(array(
-            'color'     => $background->getColor()
+            'color'     => $options->getColor()
             )
             ));
 
@@ -34,13 +34,13 @@ class ApiBackgroundController extends AbstractController
             $reponse->headers->set("Access-Control-Allow-Origin", "*");
             return $reponse;
         }
-        elseif (!is_null($background->getImage())) {
-            $file = "../public/Images/".$background->getImage();
+        elseif (!is_null($options->getImage())) {
+            $file = "../public/Images/".$options->getImage();
             return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file);
         }
         else{
             $reponse = new Response(json_encode(array(
-            'error'     => 'Erreur de background en base'
+            'error'     => 'Erreur options en base'
             )
             ));
             $reponse->headers->set("Content-Type", "application/json");
@@ -50,16 +50,16 @@ class ApiBackgroundController extends AbstractController
     }
 
     /**
-     * @Route("/veille/", name="get_background_veille", methods={"GET"})
+     * @Route("/veille/", name="get_options_veille", methods={"GET"})
      */
-    public function getBackgroundVeille(){
+    public function getOptionsVeille(){
 
-        $repository = $this->getDoctrine()->getRepository(Background::class);
-        $background = $repository->findOneBy(array('veille' => 1));
+        $repository = $this->getDoctrine()->getRepository(Options::class);
+        $options = $repository->findOneBy(array('veille' => 1));
 
-        if(!is_null($background->getColor())) {
+        if(!is_null($options->getColor())) {
             $reponse = new Response(json_encode(array(
-            'color'     => $background->getColor()
+            'color'     => $options->getColor()
             )
             ));
 
@@ -67,13 +67,13 @@ class ApiBackgroundController extends AbstractController
             $reponse->headers->set("Access-Control-Allow-Origin", "*");
             return $reponse;
         }
-        elseif (!is_null($background->getImage())) {
-            $file = "../public/Images/".$background->getImage();
+        elseif (!is_null($options->getImage())) {
+            $file = "../public/Images/".$options->getImage();
             return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file);
         }
         else{
             $reponse = new Response(json_encode(array(
-            'error'     => 'Erreur de background en base'
+            'error'     => 'Erreur options en base'
             )
             ));
             $reponse->headers->set("Content-Type", "application/json");
@@ -83,56 +83,56 @@ class ApiBackgroundController extends AbstractController
     }
 
     /**
-     * @Route("/", name="post_background", methods={"POST"})
+     * @Route("/", name="post_options", methods={"POST"})
      */
-    public function postBackground(Request $request){
+    public function postOptions(Request $request){
         $em = $this->getDoctrine()->getManager();
         $data = [];
-        $background = null;
+        $options = null;
         $veille = "";
 
         if($request->headers->get('X-Auth-Token') !== null) {
             $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
             if($authentication !== null) {
                 if($request->get('veille') === 'false') {
-                    $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 0));
-                    if($background === null) {
-                        $background = new Background();
-                        $background->setVeille(0);
+                    $options = $em->getRepository(Options::class)->findOneBy(array('veille' => 0));
+                    if($options === null) {
+                        $options = new Options();
+                        $options->setVeille(0);
                     }
 
                 } elseif ($request->get('veille') === 'true'){
-                    $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 1));
-                    if($background === null) {
-                        $background = new Background();
-                        $background->setVeille(1);
+                    $options = $em->getRepository(Options::class)->findOneBy(array('veille' => 1));
+                    if($options === null) {
+                        $options = new Options();
+                        $options->setVeille(1);
                     }
                     $veille = "_veille";
                 }
                 $pic = $request->files->get('image');
                 $color = $request->get('color');                
                 
-                if($background !== null) {
+                if($options !== null) {
                     if($color !== null && $pic === null) {
-                        $background->setColor($color);
-                        $background->setImage(null);
-                        $em->persist($background);
+                        $options->setColor($color);
+                        $options->setImage(null);
+                        $em->persist($options);
                         $em->flush();
-                        $data = ['color' => $background->getColor()];
+                        $data = ['color' => $options->getColor()];
                     }
                     elseif ($color === null && $pic !== null) {
-                        $pic_name = 'background'.$veille.".".$pic->guessExtension();
+                        $pic_name = 'options'.$veille.".".$pic->guessExtension();
                         $pic->move("../public/Images/", $pic_name);    
-                        $background->setColor(null);
-                        $background->setImage($pic_name);
-                        $em->persist($background);
+                        $options->setColor(null);
+                        $options->setImage($pic_name);
+                        $em->persist($options);
                         $em->flush();
-                        $data = ['image' => $background->getImage()];
+                        $data = ['image' => $options->getImage()];
                     } else {
-                        $data = ["error" => "Erreur requête background"];
+                        $data = ["error" => "Erreur requête options"];
                     }
                 } else{
-                    $data = ['error' => 'Background introuvable en base'];
+                    $data = ['error' => 'Options introuvables en base'];
                 }
             } else {
                 $data = ["error" => "X-Auth-Token invalide"];
