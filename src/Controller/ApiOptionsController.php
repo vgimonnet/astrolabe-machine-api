@@ -59,23 +59,32 @@ class ApiOptionsController extends AbstractController
 
         if(!is_null($options->getColor())) {
             $reponse = new Response(json_encode(array(
-            'color'     => $options->getColor()
+            'color'     => $options->getColor(),
+            'temps_veille_1' => $options->getTempsVeille1(),
+            'temps_veille_2' => $options->getTempsVeille2()
             )
             ));
-
-            $reponse->headers->set("Content-Type", "application/json");
-            $reponse->headers->set("Access-Control-Allow-Origin", "*");
-            return $reponse;
         }
         elseif (!is_null($options->getImage())) {
             $file = "../public/Images/".$options->getImage();
             return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file);
+            
+            //AJOUT IK 31/03/2020
+            /*$reponse = new Response(json_encode(array(
+            'img'     => \Symfony\Component\HttpFoundation\BinaryFileResponse($file),
+            'temps_veille_1' => $options->getTempsVeille1(),
+            'temps_veille_2' => $options->getTempsVeille2()
+            )
+            ));*/
         }
         else{
             $reponse = new Response(json_encode(array(
             'error'     => 'Erreur options en base'
             )
             ));
+        }
+
+        if($reponse) {
             $reponse->headers->set("Content-Type", "application/json");
             $reponse->headers->set("Access-Control-Allow-Origin", "*");
             return $reponse;
