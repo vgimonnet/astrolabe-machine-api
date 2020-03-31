@@ -163,4 +163,47 @@ class ApiOptionsController extends AbstractController
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
         return $reponse;
     }
+
+    /**
+     * @Route("/veille", name="post_temps_veille", methods={"POST"})
+     */
+    public function postTempsVeille(Request $request) {
+        if($request->headers->get('X-Auth-Token') !== null) {
+            $em = $this->getDoctrine()->getManager();
+            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
+            if($authentication !== null) {
+                $options = $em->getRepository(Options::class)->findOneBy(array('veille' => 1));
+                if($options !== null) {
+                    if($request->get('temps_veille_1') !== null) {
+                        $options->setTempsVeille1($request->get('temps_veille_1'));
+                        array_push($data, ['temps_veille_1']);
+                        $em->persist($options);
+                        $em->flush();
+                    }
+
+                    if($request->get('temps_veille_2') !== null) {
+                        $options->setTempsVeille2($request->get('temps_veille_2'));
+                        array_push($data, ['temps_veille_2']);
+                        $em->persist($options);
+                        $em->flush();
+                    }
+
+                    if($request->get('temps_veille_1') === null && $request->get('temps_veille_2') === null) {
+                        $data = ["error" => "Aucune valeur saisie pour les temps de veilles"];
+                    }
+
+                } else {
+                    $data = ["error" => "Option de veille non existanste"];
+                }
+            } else {
+                $data = ["error" => "X-Auth-Token invalide"];
+            }
+        } else {
+            $data = ["error" => "X-Auth-Token est requis"];
+        }
+        $reponse = new Response(json_encode($data));
+        $reponse->headers->set("Content-Type", "application/json");
+        $reponse->headers->set("Access-Control-Allow-Origin", "*");
+        return $reponse;
+    }
 }
