@@ -82,25 +82,6 @@ class ApiBackgroundController extends AbstractController
     }
 
     /**
-     * @Route("/temps_veille/", name="get_temps_veille", methods={"GET"})
-     */
-/*    public function getTempsVeille(){
-
-        $repository = $this->getDoctrine()->getRepository(Background::class);
-        $background = $repository->findOneBy(array('veille' => 1));
-
-        $reponse = new Response(json_encode(array(
-            'temps_veille_1' => $background->getTempsVeille1(),
-            'temps_veille_2' => $background->getTempsVeille2()
-            )
-        ));
-        
-        $reponse->headers->set("Content-Type", "application/json");
-        $reponse->headers->set("Access-Control-Allow-Origin", "*");
-        return $reponse;
-    }
-*/
-    /**
      * @Route("/", name="post_background", methods={"POST"})
      */
     public function postBackground(Request $request){
@@ -163,48 +144,4 @@ class ApiBackgroundController extends AbstractController
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
         return $reponse;
     }
-
-    /**
-     * @Route("/veille", name="post_temps_veille", methods={"POST"})
-     */
-/*    public function postTempsVeille(Request $request) {
-        if($request->headers->get('X-Auth-Token') !== null) {
-            $em = $this->getDoctrine()->getManager();
-            $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
-            if($authentication !== null) {
-                $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 1));
-                if($background !== null) {
-                    if($request->get('temps_veille_1') !== null) {
-                        $background->setTempsVeille1($request->get('temps_veille_1'));
-                        array_push($data, ['temps_veille_1']);
-                        $em->persist($background);
-                        $em->flush();
-                    }
-
-                    if($request->get('temps_veille_2') !== null) {
-                        $background->setTempsVeille2($request->get('temps_veille_2'));
-                        array_push($data, ['temps_veille_2']);
-                        $em->persist($background);
-                        $em->flush();
-                    }
-
-                    if($request->get('temps_veille_1') === null && $request->get('temps_veille_2') === null) {
-                        $data = ["error" => "Aucune valeur saisie pour les temps de veilles"];
-                    }
-
-                } else {
-                    $data = ["error" => "Option de veille non existanste"];
-                }
-            } else {
-                $data = ["error" => "X-Auth-Token invalide"];
-            }
-        } else {
-            $data = ["error" => "X-Auth-Token est requis"];
-        }
-        $reponse = new Response(json_encode($data));
-        $reponse->headers->set("Content-Type", "application/json");
-        $reponse->headers->set("Access-Control-Allow-Origin", "*");
-        return $reponse;
-    }
-*/
 }
