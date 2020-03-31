@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Authentification;
-use App\Entity\Options;
+use App\Entity\Background;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
@@ -12,21 +12,21 @@ use Symfony\Component\Routing\Annotation\Route;;
 
 
 /**
- * @Route("/api/options", name="api_options")
+ * @Route("/api/background", name="api_background")
  */
-class ApiOptionsController extends AbstractController
+class ApiBackgroundController extends AbstractController
 {
     /**
-     * @Route("/", name="get_options", methods={"GET"})
+     * @Route("/", name="get_background", methods={"GET"})
      */
-    public function getOptions(){
+    public function getBackground(){
 
-        $repository = $this->getDoctrine()->getRepository(Options::class);
-        $options = $repository->findOneBy(array('veille' => 0));
+        $repository = $this->getDoctrine()->getRepository(Background::class);
+        $background = $repository->findOneBy(array('veille' => 0));
 
-        if(!is_null($options->getColor())) {
+        if(!is_null($background->getColor())) {
             $reponse = new Response(json_encode(array(
-            'color'     => $options->getColor()
+            'color'     => $background->getColor()
             )
             ));
 
@@ -34,13 +34,13 @@ class ApiOptionsController extends AbstractController
             $reponse->headers->set("Access-Control-Allow-Origin", "*");
             return $reponse;
         }
-        elseif (!is_null($options->getImage())) {
-            $file = "../public/Images/".$options->getImage();
+        elseif (!is_null($background->getImage())) {
+            $file = "../public/Images/".$background->getImage();
             return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file);
         }
         else{
             $reponse = new Response(json_encode(array(
-            'error'     => 'Erreur options en base'
+            'error'     => 'Erreur background en base'
             )
             ));
             $reponse->headers->set("Content-Type", "application/json");
@@ -50,26 +50,26 @@ class ApiOptionsController extends AbstractController
     }
 
     /**
-     * @Route("/veille/", name="get_options_veille", methods={"GET"})
+     * @Route("/veille/", name="get_background_veille", methods={"GET"})
      */
-    public function getOptionsVeille(){
+    public function getBackgroundVeille(){
 
-        $repository = $this->getDoctrine()->getRepository(Options::class);
-        $options = $repository->findOneBy(array('veille' => 1));
+        $repository = $this->getDoctrine()->getRepository(Background::class);
+        $background = $repository->findOneBy(array('veille' => 1));
 
-        if(!is_null($options->getColor())) {
+        if(!is_null($background->getColor())) {
             $reponse = new Response(json_encode(array(
-            'color'     => $options->getColor(),
+            'color'     => $background->getColor(),
             )
             ));
         }
-        elseif (!is_null($options->getImage())) {
-            $file = "../public/Images/".$options->getImage();
+        elseif (!is_null($background->getImage())) {
+            $file = "../public/Images/".$background->getImage();
             return new \Symfony\Component\HttpFoundation\BinaryFileResponse($file);
         }
         else{
             $reponse = new Response(json_encode(array(
-            'error'     => 'Erreur options en base'
+            'error'     => 'Erreur background en base'
             )
             ));
         }
@@ -84,14 +84,14 @@ class ApiOptionsController extends AbstractController
     /**
      * @Route("/temps_veille/", name="get_temps_veille", methods={"GET"})
      */
-    public function getTempsVeille(){
+/*    public function getTempsVeille(){
 
-        $repository = $this->getDoctrine()->getRepository(Options::class);
-        $options = $repository->findOneBy(array('veille' => 1));
+        $repository = $this->getDoctrine()->getRepository(Background::class);
+        $background = $repository->findOneBy(array('veille' => 1));
 
         $reponse = new Response(json_encode(array(
-            'temps_veille_1' => $options->getTempsVeille1(),
-            'temps_veille_2' => $options->getTempsVeille2()
+            'temps_veille_1' => $background->getTempsVeille1(),
+            'temps_veille_2' => $background->getTempsVeille2()
             )
         ));
         
@@ -99,58 +99,58 @@ class ApiOptionsController extends AbstractController
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
         return $reponse;
     }
-
+*/
     /**
-     * @Route("/", name="post_options", methods={"POST"})
+     * @Route("/", name="post_background", methods={"POST"})
      */
-    public function postOptions(Request $request){
+    public function postBackground(Request $request){
         $em = $this->getDoctrine()->getManager();
         $data = [];
-        $options = null;
+        $background = null;
         $veille = "";
 
         if($request->headers->get('X-Auth-Token') !== null) {
             $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
             if($authentication !== null) {
                 if($request->get('veille') === 'false') {
-                    $options = $em->getRepository(Options::class)->findOneBy(array('veille' => 0));
-                    if($options === null) {
-                        $options = new Options();
-                        $options->setVeille(0);
+                    $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 0));
+                    if($background === null) {
+                        $background = new Background();
+                        $background->setVeille(0);
                     }
 
                 } elseif ($request->get('veille') === 'true'){
-                    $options = $em->getRepository(Options::class)->findOneBy(array('veille' => 1));
-                    if($options === null) {
-                        $options = new Options();
-                        $options->setVeille(1);
+                    $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 1));
+                    if($background === null) {
+                        $background = new Background();
+                        $background->setVeille(1);
                     }
                     $veille = "_veille";
                 }
                 $pic = $request->files->get('image');
                 $color = $request->get('color');                
                 
-                if($options !== null) {
+                if($background !== null) {
                     if($color !== null && $pic === null) {
-                        $options->setColor($color);
-                        $options->setImage(null);
-                        $em->persist($options);
+                        $background->setColor($color);
+                        $background->setImage(null);
+                        $em->persist($background);
                         $em->flush();
-                        $data = ['color' => $options->getColor()];
+                        $data = ['color' => $background->getColor()];
                     }
                     elseif ($color === null && $pic !== null) {
-                        $pic_name = 'options'.$veille.".".$pic->guessExtension();
+                        $pic_name = 'background'.$veille.".".$pic->guessExtension();
                         $pic->move("../public/Images/", $pic_name);    
-                        $options->setColor(null);
-                        $options->setImage($pic_name);
-                        $em->persist($options);
+                        $background->setColor(null);
+                        $background->setImage($pic_name);
+                        $em->persist($background);
                         $em->flush();
-                        $data = ['image' => $options->getImage()];
+                        $data = ['image' => $background->getImage()];
                     } else {
-                        $data = ["error" => "Erreur requête options"];
+                        $data = ["error" => "Erreur requête background"];
                     }
                 } else{
-                    $data = ['error' => 'Options introuvables en base'];
+                    $data = ['error' => 'Background introuvables en base'];
                 }
             } else {
                 $data = ["error" => "X-Auth-Token invalide"];
@@ -167,24 +167,24 @@ class ApiOptionsController extends AbstractController
     /**
      * @Route("/veille", name="post_temps_veille", methods={"POST"})
      */
-    public function postTempsVeille(Request $request) {
+/*    public function postTempsVeille(Request $request) {
         if($request->headers->get('X-Auth-Token') !== null) {
             $em = $this->getDoctrine()->getManager();
             $authentication = $em->getRepository(Authentification::class)->findOneBy(["token" => $request->headers->get('X-Auth-Token')]);
             if($authentication !== null) {
-                $options = $em->getRepository(Options::class)->findOneBy(array('veille' => 1));
-                if($options !== null) {
+                $background = $em->getRepository(Background::class)->findOneBy(array('veille' => 1));
+                if($background !== null) {
                     if($request->get('temps_veille_1') !== null) {
-                        $options->setTempsVeille1($request->get('temps_veille_1'));
+                        $background->setTempsVeille1($request->get('temps_veille_1'));
                         array_push($data, ['temps_veille_1']);
-                        $em->persist($options);
+                        $em->persist($background);
                         $em->flush();
                     }
 
                     if($request->get('temps_veille_2') !== null) {
-                        $options->setTempsVeille2($request->get('temps_veille_2'));
+                        $background->setTempsVeille2($request->get('temps_veille_2'));
                         array_push($data, ['temps_veille_2']);
-                        $em->persist($options);
+                        $em->persist($background);
                         $em->flush();
                     }
 
@@ -206,4 +206,5 @@ class ApiOptionsController extends AbstractController
         $reponse->headers->set("Access-Control-Allow-Origin", "*");
         return $reponse;
     }
+*/
 }

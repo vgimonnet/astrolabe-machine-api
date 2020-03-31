@@ -2,25 +2,25 @@
 
 namespace App\Repository;
 
-use App\Entity\Options;
+use App\Entity\Background;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 /**
- * @method Options|null find($id, $lockMode = null, $lockVersion = null)
- * @method Options|null findOneBy(array $criteria, array $orderBy = null)
- * @method Options[]    findAll()
- * @method Options[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Background|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Background|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Background[]    findAll()
+ * @method Background[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class OptionsRepository extends ServiceEntityRepository
+class BackgroundRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, Options::class);
+        parent::__construct($registry, Background::class);
     }
 
     // /**
-    //  * @return Options[] Returns an array of Options objects
+    //  * @return Background[] Returns an array of Background objects
     //  */
     /*
     public function findByExampleField($value)
@@ -37,7 +37,7 @@ class OptionsRepository extends ServiceEntityRepository
     */
 
     /*
-    public function findOneBySomeField($value): ?Options
+    public function findOneBySomeField($value): ?Background
     {
         return $this->createQueryBuilder('b')
             ->andWhere('b.exampleField = :val')
