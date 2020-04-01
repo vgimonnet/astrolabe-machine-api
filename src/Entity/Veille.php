@@ -26,6 +26,11 @@ class Veille
      */
     private $label;
 
+    /**
+     * @ORM\Column(type="boolean", nullable=true)
+     */
+    private $is_actif;
+
     public function getId(): ?int
     {
         return $this->id;
@@ -51,6 +56,18 @@ class Veille
     public function setLabel(string $label): self
     {
         $this->label = $label;
+
+        return $this;
+    }
+
+    public function getIsActif(): ?bool
+    {
+        return $this->is_actif;
+    }
+
+    public function setIsActif(?bool $is_actif): self
+    {
+        $this->is_actif = $is_actif;
 
         return $this;
     }

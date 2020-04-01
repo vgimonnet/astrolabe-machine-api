@@ -21,11 +21,22 @@ class ApiVeilleController extends AbstractController
     public function getTempsVeille() {
         $data = [];
         $em = $this->getDoctrine()->getManager();
-        $veilleNormal = $em->getRepository(Veille::class) ->findOneBy(['label' => 'temps_normal']);
-        $veilleMedia = $em->getRepository(Veille::class) ->findOneBy(['label' => 'temps_media']);
-        $veilleNormal !== null ? array_push($data, ["temps_normal" => $veilleNormal->getTemps()]) : array_push($data, ["error" => "Temps de veille normal non trouvé en base"]);
-        $veilleMedia !== null ? array_push($data, ["temps_media" => $veilleNormal->getTemps()]) : array_push($data, ["error" => "Temps de veille media non trouvé en base"]);
+        // $veilleNormal = $em->getRepository(Veille::class) ->findOneBy(['label' => 'temps_normal']);
+        // $veilleMedia = $em->getRepository(Veille::class) ->findOneBy(['label' => 'temps_media']);
+        // $veilleNormal !== null ? array_push($data, ["temps_normal" => $veilleNormal->getTemps()]) : array_push($data, ["error" => "Temps de veille normal non trouvé en base"]);
+        // $veilleMedia !== null ? array_push($data, ["temps_media" => $veilleNormal->getTemps()]) : array_push($data, ["error" => "Temps de veille media non trouvé en base"]);
         
+        $veilleActive = $em->getRepository(Veille::class)->findOneBy(["is_actif" => 1]);
+        if($veilleActive !== null) {
+            $data = [
+                "label" => $veilleActive->getLabel(),
+                "temps" => $veilleActive->getTemps(),
+                "is_actif" => $veilleActive->getIsActif(),
+            ];
+        } else {
+            $data = ["error" => "Aucune veille active"];
+        }
+
         $reponse = new Response();
         $reponse->setContent(json_encode($data));
         $reponse->headers->set("Content-Type", "application/json");
@@ -34,7 +45,7 @@ class ApiVeilleController extends AbstractController
     }
 
     /**
-     * @Route("/", name="put_temps_veille", methods={"POST"})
+     * @Route("/", name="post_temps_veille", methods={"POST"})
      */
     public function postTempsVeille(Request $request) {
         if($request->headers->get('X-Auth-Token') !== null) {
@@ -43,13 +54,14 @@ class ApiVeilleController extends AbstractController
             if($authentication !== null) {
                 $veilleNormal = null;
                 $veilleMedia = null;
-                if($request->get('temps_normal') !== null && $request->get('temps_media') !== null) {
+                if($request->get('temps_normal') !== null && $request->get('temps_media') !== null && $request->get('is_actif') !== null ) {
                     $veilleNormal = $em->getRepository(Veille::class) ->findOneBy(['label' => 'temps_normal']);
                     if($veilleNormal === null) {
                         $veilleNormal = new Veille();
                         $veilleNormal->setLabel('temps_normal');
                     }
                     $veilleNormal->setTemps($request->get('temps_normal'));
+                    $request->get('is_actif') == "temps_normal"  ? $veilleNormal->setIsActif(true) : $veilleNormal->setIsActif(false);
 
                     $veilleMedia = $em->getRepository(Veille::class) ->findOneBy(['label' => 'temps_media']);
                     if($veilleMedia === null) {
@@ -57,6 +69,7 @@ class ApiVeilleController extends AbstractController
                         $veilleMedia->setLabel('temps_media');
                     }
                     $veilleMedia->setTemps($request->get('temps_media'));
+                    $request->get('is_actif') == "temps_media"  ? $veilleMedia->setIsActif(true) : $veilleMedia->setIsActif(false);
                     
                     $em->persist($veilleNormal);
                     $em->persist($veilleMedia);
