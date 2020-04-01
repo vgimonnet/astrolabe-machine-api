@@ -23,8 +23,8 @@ class ApiVeilleController extends AbstractController
         $em = $this->getDoctrine()->getManager();
         $veilleNormal = $em->getRepository(Veille::class) ->findOneBy(['label' => 'temps_normal']);
         $veilleMedia = $em->getRepository(Veille::class) ->findOneBy(['label' => 'temps_media']);
-        $veilleNormal !== null ? array_push($data, ["temps_normal" => $veilleNormal->getTemps()]) : array_push($data, ["error" => "Temps de veille normal non trouvé en base"]);
-        $veilleMedia !== null ? array_push($data, ["temps_media" => $veilleNormal->getTemps()]) : array_push($data, ["error" => "Temps de veille media non trouvé en base"]);
+        $veilleNormal !== null ? array_push($data, ["temps_normal" => $veilleNormal->getTemps(), "is_actif" => $veilleNormal->getIsActif()]) : array_push($data, ["error" => "Temps de veille normal non trouvé en base"]);
+        $veilleMedia !== null ? array_push($data, ["temps_media" => $veilleMedia->getTemps(), "is_actif" => $veilleMedia->getIsActif()]) : array_push($data, ["error" => "Temps de veille media non trouvé en base"]);
         
         // $veilleActive = $em->getRepository(Veille::class)->findOneBy(["is_actif" => 1]);
         // if($veilleActive !== null) {
