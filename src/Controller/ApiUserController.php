@@ -71,7 +71,7 @@ class ApiUserController extends AbstractController
     }
 
     /**
-     * @Route("/create", name="user_create", methods={"POST"}, options={"expose"=false})
+     * @Route("/create", name="user_create", methods={"POST"})
      */
     // public function createAction(Request $request)
     // {
