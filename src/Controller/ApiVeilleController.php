@@ -79,11 +79,13 @@ class ApiVeilleController extends AbstractController
                     array_push($data, [
                         "label" => $veilleNormal->getLabel(),
                         "temps" => $veilleNormal->getTemps(),
+                        "is_actif" => $veilleNormal->getIsActif()
                     ]);
 
                     array_push($data, [
                         "label" => $veilleMedia->getLabel(),
                         "temps" => $veilleMedia->getTemps(),
+                        "is_actif" => $veilleMedia->getIsActif()
                     ]);
 
                 } else {
