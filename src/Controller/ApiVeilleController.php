@@ -54,6 +54,7 @@ class ApiVeilleController extends AbstractController
             if($authentication !== null) {
                 $veilleNormal = null;
                 $veilleMedia = null;
+                $data = [];
                 if($request->get('temps_normal') !== null && $request->get('temps_media') !== null && $request->get('is_actif') !== null ) {
                     $veilleNormal = $em->getRepository(Veille::class) ->findOneBy(['label' => 'temps_normal']);
                     if($veilleNormal === null) {
