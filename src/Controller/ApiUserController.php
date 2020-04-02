@@ -71,43 +71,43 @@ class ApiUserController extends AbstractController
     }
 
     /**
-     * @Route("/create", name="user_create", methods={"POST"})
+     * @Route("/create", name="user_create", methods={"POST"}, options={"expose"=false})
      */
-    public function createAction(Request $request)
-    {
-        $em = $this->getDoctrine()->getManager();
-        $data = [];
-        if($request->get('username') != null && $request->get('password') != null) {
-            $user_exist = $em->getRepository(User::class)->findOneBy(array('username' => $request->get('username')));
-            if(!$user_exist){
-                $user = new User();
-                $plainPassword = $request->get('password');
-                $options = [
-                    'cost' => 12,
-                ];
-                $password = password_hash($plainPassword, PASSWORD_BCRYPT, $options);
-                $user->setPassword($password);
-                $user->setUsername($request->get('username'));
-                $user->setIsAdmin(0);
-                $em->persist($user);
-                $em->flush();
-                $data = [
-                    'id' => $user->getId(),
-                    'username' => $user->getUsername(),
-                ];
-            } else {
-                $data = ['error' => "user existe deja "];    
-            }            
-        } else {
-            $data = ['error' => 'Mot de passe ou identifiant invalide'];
-        }        
+    // public function createAction(Request $request)
+    // {
+    //     $em = $this->getDoctrine()->getManager();
+    //     $data = [];
+    //     if($request->get('username') != null && $request->get('password') != null) {
+    //         $user_exist = $em->getRepository(User::class)->findOneBy(array('username' => $request->get('username')));
+    //         if(!$user_exist){
+    //             $user = new User();
+    //             $plainPassword = $request->get('password');
+    //             $options = [
+    //                 'cost' => 12,
+    //             ];
+    //             $password = password_hash($plainPassword, PASSWORD_BCRYPT, $options);
+    //             $user->setPassword($password);
+    //             $user->setUsername($request->get('username'));
+    //             $user->setIsAdmin(0);
+    //             $em->persist($user);
+    //             $em->flush();
+    //             $data = [
+    //                 'id' => $user->getId(),
+    //                 'username' => $user->getUsername(),
+    //             ];
+    //         } else {
+    //             $data = ['error' => "user existe deja "];    
+    //         }            
+    //     } else {
+    //         $data = ['error' => 'Mot de passe ou identifiant invalide'];
+    //     }        
 
-        $reponse = new Response();
-        $reponse->setContent(json_encode($data));
-        $reponse->headers->set("Content-Type", "application/json");
-        $reponse->headers->set("Access-Control-Allow-Origin", "*");
-        return $reponse;         
-    }
+    //     $reponse = new Response();
+    //     $reponse->setContent(json_encode($data));
+    //     $reponse->headers->set("Content-Type", "application/json");
+    //     $reponse->headers->set("Access-Control-Allow-Origin", "*");
+    //     return $reponse;         
+    // }
 
     /**
      * @Route("/changepassword", name="user_changepassword", methods={"POST"})
