@@ -41,11 +41,13 @@ class ApiUserController extends AbstractController
                         $authentification->setUser($user);
                     }
                     
+
+                    //génération du token
                     $options = [
                         'cost' => 12,
                     ];
                     $token = base64_encode(password_hash($request->get('username'), PASSWORD_BCRYPT, $options));
-                    $token .= bin2hex(openssl_random_pseudo_bytes(50)); //revoir génération du token
+                    $token .= bin2hex(openssl_random_pseudo_bytes(50));
 
                     $authentification->setToken($token);                    
 
